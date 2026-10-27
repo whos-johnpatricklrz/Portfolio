@@ -1,0 +1,404 @@
+/* ============================================
+   TESTIMONIALS - the fixed viewport
+   Head, then one glass sheet split in two: the video proof on the left, the
+   client ledger on the right. Sized to the panel, so nothing here scrolls.
+   ============================================ */
+
+.tgrid__glass { min-height: 0; }
+
+@media (min-width: 1100px) {
+  .tgrid__glass {
+    height: 100%;
+    display: grid;
+    grid-template-columns: minmax(300px, 0.8fr) minmax(0, 1.5fr);
+    /* minmax(0, 1fr), not the implicit auto row: an auto row is sized by its
+       tallest item, so a tall clip's intrinsic height would grow the whole
+       sheet and shift the ledger every time you switch clips. */
+    grid-template-rows: minmax(0, 1fr);
+    gap: clamp(16px, 1.6vw, 28px);
+    align-items: stretch;
+  }
+}
+
+/* ---------- Left: the reel ----------
+   ONE plate for both clips, the same size whichever is chosen. Until a clip
+   is asked to play the plate shows its poster as cover art, edge to edge -
+   a poster fills a frame in either orientation, a paused <video> cannot, and
+   letterboxing left a third of the plate as dead margin. Play swaps the
+   cover for the real player, contained on the same plate. */
+.tgrid__reel {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.2vh, 14px);
+  min-height: 0;
+  min-width: 0;
+}
+.tgrid__stage {
+  position: relative;
+  /* flex-basis 0, not auto: on auto the stage takes its content height, and
+     the two clips have very different content heights. */
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: #0B1120;
+  border: 1px solid var(--line-strong);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 1px 2px rgba(6, 12, 26, 0.04),
+    0 30px 60px -36px rgba(6, 12, 26, 0.55);
+}
+
+/* The cover. A button the size of the plate; the poster underneath, a shade
+   that darkens the foot so the caption reads, a play mark in the middle. */
+.tgrid__cover {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  color: #fff;
+  text-align: left;
+}
+.tgrid__cover-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  transform: scale(1.02);
+  transition: transform 700ms var(--ease-out);
+}
+.tgrid__cover:hover .tgrid__cover-img { transform: scale(1.06); }
+.tgrid__cover-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(11, 17, 32, 0.10) 0%, rgba(11, 17, 32, 0) 35%, rgba(11, 17, 32, 0.78) 100%),
+    radial-gradient(60% 45% at 50% 50%, rgba(11, 17, 32, 0.22), transparent 70%);
+}
+.tgrid__cover-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: clamp(60px, 4.6vw, 76px);
+  height: clamp(60px, 4.6vw, 76px);
+  border-radius: 50%;
+  color: #0B1120;
+  background: var(--orange);
+  box-shadow:
+    0 0 0 8px rgba(255, 122, 26, 0.22),
+    0 18px 40px -14px rgba(0, 0, 0, 0.7);
+  transform: translate(-50%, -50%);
+  transition: transform 260ms var(--ease-spring), box-shadow 260ms var(--ease-out);
+}
+.tgrid__cover-play svg { margin-left: 3px; }
+.tgrid__cover:hover .tgrid__cover-play {
+  transform: translate(-50%, -50%) scale(1.06);
+  box-shadow:
+    0 0 0 12px rgba(255, 122, 26, 0.18),
+    0 22px 44px -14px rgba(0, 0, 0, 0.75);
+}
+.tgrid__cover:focus-visible { outline: 2px solid var(--orange); outline-offset: -4px; }
+.tgrid__cover-meta {
+  position: absolute;
+  left: clamp(14px, 1.3vw, 22px);
+  right: clamp(14px, 1.3vw, 22px);
+  bottom: clamp(14px, 1.6vh, 22px);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.tgrid__cover-kicker {
+  font-size: clamp(14px, 1.05vw, 18px);
+  font-weight: 700;
+  letter-spacing: -0.012em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+.tgrid__cover-sub {
+  font-size: clamp(11px, 0.7vw, 12.5px);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* The real player, once asked for. Absolutely positioned so it contributes
+   nothing to layout; the max-* pair resolves against the plate's padding box
+   with the inset subtracted, so it never touches the frame edge. */
+.tgrid__video {
+  --stage-pad: clamp(10px, 1.2vw, 18px);
+  position: absolute;
+  inset: var(--stage-pad);
+  margin: auto;
+  max-width: calc(100% - 2 * var(--stage-pad));
+  max-height: calc(100% - 2 * var(--stage-pad));
+  width: auto;
+  height: auto;
+  border-radius: calc(var(--radius-card) - 8px);
+  background: #000;
+  box-shadow: 0 18px 44px -20px rgba(0, 0, 0, 0.65);
+}
+
+/* ---------- The picker ----------
+   One segmented control: two cells on a shared plate, a hairline between,
+   the active cell lit and underlined in the accent. */
+.tgrid__picker {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  flex: 0 0 auto;
+  border-radius: 14px;
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+  overflow: hidden;
+}
+.tgrid__pick {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 9px 12px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  transition: background 220ms var(--ease-out), color 220ms var(--ease-out);
+}
+.tgrid__pick + .tgrid__pick { box-shadow: inset 1px 0 0 var(--line); }
+.tgrid__pick::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--orange);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 260ms var(--ease-spring);
+}
+.tgrid__pick:hover { background: var(--tint); color: var(--navy); }
+.tgrid__pick.is-active { background: var(--white); color: var(--navy); }
+.tgrid__pick.is-active::after { transform: scaleX(1); }
+.tgrid__pick:focus-visible { outline: 2px solid var(--orange); outline-offset: -3px; }
+.tgrid__pick-thumb {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 32px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #0B1120;
+  box-shadow: inset 0 0 0 1px rgba(11, 30, 63, 0.12);
+}
+.tgrid__pick-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
+.tgrid__pick-copy { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.tgrid__pick-kicker {
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tgrid__pick-meta {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.tgrid__pick.is-active .tgrid__pick-meta { color: var(--orange-ink); }
+
+/* ---------- Right: the client ledger ----------
+   One plate, three rows split by hairlines. Three boxed cards each carrying
+   their own border read as three separate widgets; a single ledger reads
+   as one record. The oversized index is set in the row's own paper colour,
+   one step off it, so it is structure rather than decoration. */
+.tgrid__ledger {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.4vh, 16px);
+  min-height: 0;
+  min-width: 0;
+}
+.tgrid__ledger-head { display: flex; flex-direction: column; gap: 2px; flex: 0 0 auto; }
+.tgrid__ledger-title {
+  font-size: clamp(18px, 1.5vw, 26px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: var(--ls-display);
+  color: var(--navy);
+  margin: 0;
+}
+.tgrid__ledger-sub { font-size: 13px; color: var(--muted); margin: 0; }
+
+.tgrid__clients {
+  display: grid;
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+  min-height: 0;
+  border-radius: var(--radius-card);
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 1px 2px rgba(6, 12, 26, 0.04),
+    0 24px 50px -36px rgba(6, 12, 26, 0.45);
+  overflow: hidden;
+}
+@media (min-width: 1100px) {
+  .tgrid__clients {
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    flex: 1 1 auto;
+  }
+}
+.tgrid__client {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 1.3vw, 22px);
+  min-height: 0;
+  padding: clamp(10px, 1.4vh, 20px) clamp(18px, 1.5vw, 28px);
+  overflow: hidden;
+}
+.tgrid__client + .tgrid__client { border-top: 1px solid var(--line); }
+
+/* The index. Huge, low-contrast, pinned to the right edge and cut off by the
+   row so it reads as engraved rather than printed. */
+.tgrid__client-ghost {
+  position: absolute;
+  right: clamp(10px, 1vw, 18px);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: clamp(56px, 6vw, 96px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--navy);
+  opacity: 0.05;
+  pointer-events: none;
+  user-select: none;
+}
+[data-theme='dark'] .tgrid__client-ghost { opacity: 0.07; }
+
+.tgrid__client-mark {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: clamp(48px, 3.4vw, 58px);
+  height: clamp(48px, 3.4vw, 58px);
+  border-radius: 14px;
+  background: var(--brands-chip-bg, #F4F4ED);
+  box-shadow: inset 0 0 0 1px var(--brands-chip-border, var(--line));
+  color: var(--orange);
+}
+.tgrid__client-mark img { width: 60%; height: 60%; object-fit: contain; }
+.tgrid__client-body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(3px, 0.5vh, 6px);
+  flex: 1 1 auto;
+  min-width: 0;
+  /* Keep the copy clear of the engraved index. */
+  padding-right: clamp(56px, 5vw, 88px);
+}
+.tgrid__client-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+}
+.tgrid__client-name {
+  font-size: clamp(16px, min(1.3vw, 2.45vh), 23px);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+  color: var(--navy);
+}
+.tgrid__client-role {
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  font-size: clamp(10.5px, min(0.74vw, 1.35vh), 12.5px);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--orange-ink);
+  background: rgba(255, 122, 26, 0.10);
+  box-shadow: inset 0 0 0 1px rgba(255, 122, 26, 0.22);
+  white-space: nowrap;
+}
+/* No reserved line count here on purpose. The three lines are within ~10
+   characters of each other, so they wrap the same way at every width. Keep
+   them that length if you edit the copy. */
+.tgrid__client-daily {
+  font-size: clamp(12.5px, min(0.95vw, 1.8vh), 16.5px);
+  line-height: 1.5;
+  max-width: 78ch;
+  color: var(--muted);
+}
+.tgrid__client-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 2px 0 0;
+  padding-left: 0;
+  list-style: none;
+}
+.tgrid__client-tag {
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  font-size: clamp(11px, min(0.72vw, 1.4vh), 12.5px);
+  font-weight: 600;
+  color: var(--navy);
+  background: var(--tint);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+/* ---------- Below the shell ----------
+   Under 1100 the panel scrolls again, because App pins the fixed routes only
+   at the rail breakpoint. The two columns stack and the stage takes a height
+   that shows the cover without running off the screen. */
+@media (max-width: 1099px) {
+  .tgrid__glass { display: flex; flex-direction: column; gap: 18px; }
+  .tgrid__stage { height: min(56vh, 420px); flex: 0 0 auto; }
+  .tgrid__client-ghost { display: none; }
+  .tgrid__client-body { padding-right: 0; }
+}
+@media (max-width: 639px) {
+  .tgrid__picker { grid-template-columns: minmax(0, 1fr); }
+  .tgrid__pick + .tgrid__pick { box-shadow: inset 0 1px 0 var(--line); }
+  .tgrid__client { flex-direction: column; align-items: flex-start; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tgrid__cover-img,
+  .tgrid__cover:hover .tgrid__cover-img,
+  .tgrid__cover-play,
+  .tgrid__cover:hover .tgrid__cover-play { transition: none; transform: translate(-50%, -50%); }
+  .tgrid__cover-img,
+  .tgrid__cover:hover .tgrid__cover-img { transform: none; }
+}
+
+/* Phone type floor. */
+@media (max-width: 639px) {
+  .tgrid__cover-sub, .tgrid__pick-meta { font-size: 12px; }
+  .tgrid__client-role { font-size: 11.5px; }
+  .tgrid__client-tag { font-size: 12px; }
+}

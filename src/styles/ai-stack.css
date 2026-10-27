@@ -1,0 +1,535 @@
+/* ==========================================================================
+   AI STACK - the org-chart tree that opens section 11 (Projects).
+
+   Sits on the cream page, inside .projects, so it borrows that section's
+   language: white cards, hairline navy borders, soft downward shadows, one
+   orange accent. Depth is expressed with size, weight and elevation only -
+   a second hue per branch would read as a legend nobody asked for.
+
+   Layout is plain flex/grid on a nested <ul>. The connectors live in an
+   absolutely positioned <svg> whose path data is measured at runtime by
+   AIStack.tsx, so nothing here needs to know a single coordinate. The one
+   contract between the two files is --ai-stack-indent below, which has to
+   stay larger than RAIL_INSET in the component or the rail would start
+   outside its own gutter.
+   ========================================================================== */
+
+.ai-stack {
+  --ai-stack-indent: 30px;
+  --ai-stack-wire: rgba(11, 30, 63, 0.26);
+
+  position: relative;
+  margin-bottom: clamp(52px, 6vw, 84px);
+  color: var(--navy);
+}
+
+/* ── Connector layer ─────────────────────────────────────────────
+   Behind the cards, never hit-testable. preserveAspectRatio is none so a
+   resize that lands between a reflow and the next measure stretches the
+   wires by a pixel instead of clipping them; non-scaling-stroke keeps the
+   hairline honest while that happens. */
+.ai-stack__wires {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ai-stack__wire {
+  fill: none;
+  stroke: var(--ai-stack-wire);
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* pathLength="1" is set on the element, so one dash of length 1 is the
+     whole path regardless of how long the measured elbow actually is. */
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 1;
+  transition:
+    stroke-dashoffset 900ms var(--ease-out) var(--wire-delay, 0ms),
+    stroke var(--dur-med) var(--ease-out),
+    stroke-width var(--dur-med) var(--ease-out),
+    opacity var(--dur-med) var(--ease-out);
+}
+
+.ai-stack.is-drawn .ai-stack__wire { stroke-dashoffset: 0; }
+
+.ai-stack__wire.is-lit {
+  stroke: var(--orange);
+  stroke-width: 1.9;
+}
+
+.ai-stack__wire.is-dim { opacity: 0.22; }
+
+/* ── The list, positioned into a chart ───────────────────────────── */
+.ai-stack__level {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ai-stack__item {
+  position: relative;
+  min-width: 0;
+}
+
+.ai-stack__level--trunk { display: flex; justify-content: center; }
+
+.ai-stack__item--root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(38px, 4.5vw, 60px);
+  width: 100%;
+}
+
+/* --cols comes from the data, so adding a sixth branch needs no CSS edit.
+   minmax(0, 1fr) is what stops long words from forcing the page wider. */
+.ai-stack__level--branch {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
+  /* Two explicit rows - branch cards, then their leaf lists - so the items
+     below can adopt them with subgrid. */
+  grid-template-rows: auto auto;
+  gap: clamp(14px, 1.6vw, 28px);
+  align-items: start;
+  width: 100%;
+}
+
+/* Subgrid puts every branch card in ONE shared grid row, so they all take the
+   height of the tallest and every branch drops its first leaf at the same y.
+   Left ragged the five columns staircase, and the eye reads the tree as five
+   unrelated lists instead of one level. Where subgrid is unsupported the
+   declaration is dropped and this degrades to the old ragged-but-correct
+   layout rather than breaking. */
+.ai-stack__item--branch {
+  display: grid;
+  grid-row: span 2;
+  grid-template-rows: subgrid;
+  row-gap: 16px;
+  align-content: start;
+}
+
+/* Leaves hang off a rail at every width. A horizontal fan of every leaf in
+   the tree would need several thousand pixels. */
+.ai-stack__level--leaf {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-left: var(--ai-stack-indent);
+}
+
+/* ── Cards ───────────────────────────────────────────────────────── */
+.ai-stack__node {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 15px 17px;
+  border: 1px solid rgba(11, 30, 63, 0.09);
+  border-radius: 16px;
+  background: var(--white);
+  box-shadow: 0 10px 28px -20px rgba(11, 30, 63, 0.3);
+  cursor: default;
+  transition:
+    transform var(--dur-med) var(--ease-out),
+    opacity var(--dur-med) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-med) var(--ease-out);
+}
+
+.ai-stack__node:focus { outline: none; }
+
+.ai-stack__node:focus-visible {
+  outline: 2px solid var(--orange-ink);
+  outline-offset: 3px;
+}
+
+/* Root - the only filled card. Navy is the brand's own ink, not a second
+   accent, and the contrast is what makes it read as the trunk. */
+.ai-stack__node--root {
+  align-items: center;
+  text-align: center;
+  gap: 9px;
+  max-width: 460px;
+  padding: 22px 30px;
+  border-color: transparent;
+  border-radius: var(--radius-card);
+  background: var(--navy);
+  color: var(--cream);
+  box-shadow: var(--shadow-soft);
+}
+
+.ai-stack__node--branch { padding: 17px 19px; }
+
+/* Leaves sit a step back: lighter surface, tighter box, no lift. */
+.ai-stack__node--leaf {
+  padding: 12px 14px;
+  border-radius: 13px;
+  border-color: rgba(11, 30, 63, 0.07);
+  background: rgba(255, 255, 255, 0.68);
+  box-shadow: none;
+}
+
+.ai-stack__node.is-dim { opacity: 0.32; }
+
+.ai-stack__node.is-lit {
+  border-color: rgba(255, 122, 26, 0.45);
+  box-shadow:
+    0 18px 44px -24px rgba(11, 30, 63, 0.32),
+    0 0 0 1px rgba(255, 122, 26, 0.22);
+}
+
+.ai-stack__node--root.is-lit { border-color: transparent; }
+
+/* ── Card contents ───────────────────────────────────────────────── */
+/* The status pill is the only thing allowed to wrap to its own line. The mark
+   and the name are welded together: letting the name claim a full basis
+   pushed it below the tile and stranded the glyph alone on line one. */
+.ai-stack__head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ai-stack__head > .ai-stack__name {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Mark tile. The root keeps the filled orange disc; branches and leaves get a
+   quieter tinted square so the glyph reads as a label, not a second accent
+   competing with the status pill on the same line. */
+.ai-stack__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-circle);
+  background: rgba(255, 122, 26, 0.16);
+  color: var(--orange);
+}
+
+.ai-stack__node--branch .ai-stack__mark,
+.ai-stack__node--leaf .ai-stack__mark {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  background: rgba(11, 30, 63, 0.06);
+  color: var(--navy);
+}
+
+/* The lit subtree is the one place a mark takes the accent, which is what
+   makes the highlight land on the glyph as well as the border. */
+.ai-stack__node.is-lit .ai-stack__mark {
+  background: rgba(255, 122, 26, 0.18);
+  color: var(--orange-ink);
+}
+
+.ai-stack__name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  overflow-wrap: anywhere;
+}
+
+.ai-stack__node--root .ai-stack__name {
+  font-size: clamp(20px, 2vw, 26px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.ai-stack__node--branch .ai-stack__name { font-size: clamp(14.5px, 1.15vw, 17px); }
+.ai-stack__node--leaf .ai-stack__name { font-size: 13px; font-weight: 600; }
+
+.ai-stack__what {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.ai-stack__node--root .ai-stack__what {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: rgba(244, 244, 237, 0.76);
+}
+
+.ai-stack__node--leaf .ai-stack__what { font-size: 11.5px; line-height: 1.5; }
+
+/* Vendor marks sit inline with the stack text and wrap with it, so a card
+   that gains a second logo grows by a line instead of shoving the text. */
+.ai-stack__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.045em;
+  line-height: 1.45;
+  color: rgba(90, 100, 121, 0.78);
+  overflow-wrap: anywhere;
+}
+
+.ai-stack__node--root .ai-stack__meta { color: rgba(244, 244, 237, 0.5); }
+
+/* Masked, never an <img>: each vendor mark inherits the meta ink so the row
+   stays one accent instead of importing four brand palettes onto a cream
+   page. currentColor via mask also means the lit state recolours them free. */
+.ai-stack__logo {
+  display: block;
+  flex: 0 0 auto;
+  width: 13px;
+  height: 13px;
+  background-color: currentColor;
+  opacity: 0.72;
+  -webkit-mask-image: var(--logo-mask);
+  mask-image: var(--logo-mask);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.ai-stack__logo + .ai-stack__logo { margin-left: -1px; }
+.ai-stack__node.is-lit .ai-stack__logo { opacity: 1; }
+
+/* Status - one accent, so the three states separate by fill and stroke
+   rather than by colour: solid tint, flat tint, dashed outline. */
+.ai-stack__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ai-stack__status--live {
+  color: var(--orange-ink);
+  background: rgba(255, 122, 26, 0.14);
+}
+
+.ai-stack__status--internal {
+  color: var(--muted);
+  background: rgba(11, 30, 63, 0.07);
+}
+
+.ai-stack__status--beta {
+  color: var(--muted);
+  border-color: rgba(11, 30, 63, 0.22);
+  border-style: dashed;
+}
+
+.ai-stack__node--root .ai-stack__status--live {
+  color: var(--orange-hover);
+  background: rgba(255, 122, 26, 0.2);
+}
+
+.ai-stack__node--root .ai-stack__status--internal,
+.ai-stack__node--root .ai-stack__status--beta {
+  color: rgba(244, 244, 237, 0.7);
+  background: rgba(244, 244, 237, 0.1);
+  border-color: rgba(244, 244, 237, 0.22);
+}
+
+/* ── Disclosure ──────────────────────────────────────────────────────
+   Compact only - .is-collapsible and the button are never rendered above the
+   breakpoint, so none of this needs a media query to stay off the wide tree.
+
+   The control is stretched over the card instead of wrapped around it. A
+   <button> may only contain phrasing content and the card carries a <p>, and
+   a caret-sized target is not a thumb target: the tile has to be the tap
+   area. Everything under it is inert in compact, so nothing is buried. */
+.ai-stack__toggle {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 11px;
+  margin: 0;
+  border: 0;
+  border-radius: inherit;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* The button traces the card exactly, so its ring is the card's ring. */
+.ai-stack__toggle:focus-visible {
+  outline: 2px solid var(--orange-ink);
+  outline-offset: 3px;
+}
+
+/* Replaces the tap highlight killed above. Instant and untransitioned - press
+   feedback that arrives a frame late is worse than none, and the caret is
+   already carrying the state change. */
+.ai-stack__toggle:active { background: rgba(11, 30, 63, 0.035); }
+
+/* Same tinted square as the mark tile on the other side of the card, so the
+   affordance reads as part of the card's own furniture rather than a widget
+   dropped on top of it. */
+.ai-stack__caret {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  background: rgba(11, 30, 63, 0.06);
+  color: var(--navy);
+  transition:
+    transform var(--dur-med) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+/* Driven off aria-expanded rather than a second class, so the state the
+   screen reader hears and the state the caret shows cannot drift apart. */
+.ai-stack__toggle[aria-expanded='true'] .ai-stack__caret {
+  transform: rotate(180deg);
+  background: rgba(255, 122, 26, 0.14);
+  color: var(--orange-ink);
+}
+
+/* Reserve the caret's corner. More specific than the per-level padding rules
+   below it, so it survives the 480px block without being restated there. */
+.ai-stack__node.is-collapsible { padding-right: 42px; }
+
+/* A closed branch keeps its list mounted so aria-controls resolves, and the
+   flex declaration above would otherwise beat the UA's [hidden] rule and
+   leave the whole thing on screen. */
+.ai-stack__level--leaf[hidden] { display: none; }
+
+/* ── Entrance ────────────────────────────────────────────────────────
+   The rise lives on the <li> and the hover lift on the card inside it, so
+   the animation's filled transform never blocks the hover transition. */
+.ai-stack__item { opacity: 0; }
+
+.ai-stack.is-drawn .ai-stack__item {
+  animation: ai-stack-rise 520ms var(--ease-out) var(--enter, 0ms) both;
+}
+
+@keyframes ai-stack-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ai-stack__node--branch:hover { transform: translateY(-3px); }
+  .ai-stack__node--leaf:hover { transform: translateX(2px); }
+}
+
+/* ── Compact layout ──────────────────────────────────────────────────
+   Below this width the horizontal branch row is unreadable, so the whole
+   tree becomes an indented outline: root on top, branches on a rail under
+   it, leaves on a rail under each branch. Same DOM, same component, and
+   the component re-measures because the wires change shape too. Keep this
+   number equal to COMPACT_QUERY in AIStack.tsx. */
+@media (max-width: 900px) {
+  /* Still clear of RAIL_INSET (15px) in the component, which is the one
+     number these two files share. Every step below it detaches the elbow. */
+  .ai-stack { --ai-stack-indent: 24px; }
+
+  .ai-stack__item--root {
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .ai-stack__node--root {
+    align-items: flex-start;
+    text-align: left;
+    max-width: none;
+  }
+
+  /* One card per row, so the grid that fans the branches across the wide
+     layout has nothing left to do. Flex also retires the subgrid below,
+     which would otherwise hold a phantom row-gap under every closed branch
+     and undo half of what collapsing them bought. */
+  .ai-stack__level--branch {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-left: var(--ai-stack-indent);
+  }
+
+  .ai-stack__item--branch { display: block; }
+
+  .ai-stack__level--leaf {
+    margin-top: 10px;
+    gap: 8px;
+  }
+
+  /* Type steps DOWN here, not up. At 390px the constraint is how much of the
+     tree fits in one look, and 16px branch names bought nothing that 15px
+     does not already read cleanly at arm's length. */
+  .ai-stack__node--root { padding: 18px 20px; }
+  .ai-stack__node--branch { padding: 14px 16px; }
+  .ai-stack__node--leaf { padding: 11px 13px; }
+
+  .ai-stack__node--branch .ai-stack__name { font-size: 15px; }
+  .ai-stack__what { font-size: 12.5px; }
+  .ai-stack__node--leaf .ai-stack__what { font-size: 11.5px; }
+}
+
+@media (max-width: 480px) {
+  .ai-stack { --ai-stack-indent: 20px; }
+
+  .ai-stack__node--root { padding: 16px 17px; }
+  .ai-stack__node--branch { padding: 13px 14px; }
+  .ai-stack__node--leaf { padding: 10px 12px; }
+
+  /* The root is a full-bleed card here rather than a centred plaque, so it no
+     longer needs display-size type to read as the trunk. */
+  .ai-stack__node--root .ai-stack__name { font-size: 19px; }
+  .ai-stack__node--root .ai-stack__what { font-size: 13px; }
+}
+
+/* Nothing here is load-bearing motion, so under reduced motion the tree
+   simply arrives finished - wires closed, cards in place. */
+@media (prefers-reduced-motion: reduce) {
+  .ai-stack__wire {
+    stroke-dashoffset: 0;
+    transition: none;
+  }
+
+  .ai-stack__item,
+  .ai-stack.is-drawn .ai-stack__item {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+
+  .ai-stack__node { transition: none; }
+
+  .ai-stack__node--branch:hover,
+  .ai-stack__node--leaf:hover { transform: none; }
+
+  /* The caret still turns - it is the state readout, not decoration. It just
+     arrives there rather than travelling. */
+  .ai-stack__caret { transition: none; }
+}

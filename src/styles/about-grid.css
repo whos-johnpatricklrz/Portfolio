@@ -1,0 +1,289 @@
+/* ============================================
+   ABOUT - the fixed viewport
+   Head, then one glass sheet split in two: who I am on the left, the desk
+   illustration on the right. Sized to the panel, so nothing here scrolls.
+   ============================================ */
+
+.agrid__glass { min-height: 0; }
+
+@media (min-width: 1100px) {
+  .agrid__glass {
+    height: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1.28fr) minmax(280px, 1fr);
+    /* Definite row, not the implicit auto one: the illustration is a big
+       raster and an auto row would let its intrinsic height set the sheet. */
+    grid-template-rows: minmax(0, 1fr);
+    gap: clamp(16px, 2vw, 40px);
+    align-items: stretch;
+  }
+}
+
+/* ---------- Left: the copy ---------- */
+.agrid__copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(10px, 1.5vh, 20px);
+  min-height: 0;
+  min-width: 0;
+  padding: clamp(4px, 1vh, 16px) 0 clamp(4px, 1vh, 16px) clamp(4px, 0.8vw, 16px);
+}
+
+/* The statement. This is the only display-scale type inside the sheet, so it
+   is what the eye lands on after the page title. The second sentence is a
+   span rather than its own paragraph so the two always break as one block. */
+.agrid__lead {
+  margin: 0;
+  max-width: 26ch;
+  font-size: clamp(19px, min(1.75vw, 3.1vh), 32px);
+  font-weight: 700;
+  line-height: 1.22;
+  letter-spacing: -0.022em;
+  color: var(--navy);
+  flex: 0 0 auto;
+}
+.agrid__lead span { color: var(--muted); font-weight: 600; }
+
+.agrid__note {
+  margin: 0;
+  max-width: 58ch;
+  font-size: clamp(12.5px, min(0.92vw, 1.7vh), 15.5px);
+  line-height: 1.6;
+  color: var(--muted);
+  flex: 0 0 auto;
+}
+.agrid__note strong { color: var(--navy); font-weight: 700; }
+.agrid__link {
+  color: var(--navy);
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: inset 0 -1px 0 rgba(255, 122, 26, 0.55);
+  transition: box-shadow 200ms var(--ease-out), color 200ms var(--ease-out);
+}
+.agrid__link:hover { color: var(--orange-ink); box-shadow: inset 0 -2px 0 var(--orange); }
+.agrid__link:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
+
+/* ---------- The capability ladder ----------
+   Four rows, each led by the real marks of what that work is built with. The
+   tools ARE the credential here, so they take the left edge and the label
+   follows them; a row of word chips said the same thing with nothing to look
+   at. Hairlines between rows, no card per row - four framed boxes stacked in
+   a pinned sheet reads as clutter. */
+.agrid__caps {
+  display: flex;
+  flex-direction: column;
+  margin: clamp(2px, 0.6vh, 8px) 0 0;
+  padding-left: 0;
+  list-style: none;
+  flex: 0 0 auto;
+}
+.agrid__cap {
+  /* One tile size drives the stack and the column reserved for it. The
+     column is sized for the widest stack (five marks) so every label starts
+     on the same x whether its row carries three logos or five. */
+  --tile: clamp(28px, 2.2vw, 36px);
+  --overlap: 5px;
+  display: grid;
+  grid-template-columns: calc(5 * var(--tile) - 4 * var(--overlap) + var(--overlap)) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(10px, 1vw, 16px);
+  padding: clamp(7px, 1.1vh, 13px) 2px;
+  border-top: 1px solid var(--line);
+}
+.agrid__cap:last-child { border-bottom: 1px solid var(--line); }
+
+/* The marks overlap like a stack of cards. The overlap is a static margin -
+   only the lift is animated, and only on transform, so the row never reflows
+   while it plays. */
+.agrid__cap-marks { display: inline-flex; align-items: center; padding-left: var(--overlap); }
+.agrid__mark {
+  display: grid;
+  place-items: center;
+  width: var(--tile);
+  height: var(--tile);
+  margin-left: calc(-1 * var(--overlap));
+  border-radius: 9px;
+  background: var(--white);
+  box-shadow:
+    inset 0 0 0 1px var(--line-strong),
+    0 2px 6px -3px rgba(6, 12, 26, 0.35);
+  /* Descending, so later marks sit UNDER earlier ones and the stack reads
+     left to right the way the eye scans it. */
+  z-index: var(--i);
+  transition: transform 260ms var(--ease-spring);
+}
+.agrid__mark img {
+  width: 58%;
+  height: 58%;
+  object-fit: contain;
+}
+.agrid__cap:hover .agrid__mark { transform: translateY(-3px); }
+.agrid__cap:hover .agrid__mark:nth-child(2) { transition-delay: 40ms; }
+.agrid__cap:hover .agrid__mark:nth-child(3) { transition-delay: 80ms; }
+.agrid__cap:hover .agrid__mark:nth-child(4) { transition-delay: 120ms; }
+.agrid__cap:hover .agrid__mark:nth-child(5) { transition-delay: 160ms; }
+
+.agrid__cap-title {
+  font-size: clamp(13px, min(1vw, 1.85vh), 17px);
+  font-weight: 700;
+  letter-spacing: -0.012em;
+  line-height: 1.25;
+  color: var(--navy);
+}
+.agrid__cap-index {
+  font-size: clamp(10.5px, 0.68vw, 12px);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--line-strong);
+  transition: color 220ms var(--ease-out);
+}
+.agrid__cap:hover .agrid__cap-index { color: var(--orange); }
+
+/* ---------- The credential bar ----------
+   Loose pills read as separate components fighting for the same line. This
+   is one plate with two cells that share an anatomy - a mark, a title, a
+   meta line - divided by a hairline. */
+.agrid__bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  margin-top: clamp(4px, 0.8vh, 10px);
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow:
+    inset 0 0 0 1px var(--line-strong),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 14px 34px -26px rgba(6, 12, 26, 0.45);
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+.agrid__cell {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  padding: clamp(9px, 1.2vh, 13px) clamp(12px, 1vw, 18px);
+  color: inherit;
+  text-decoration: none;
+}
+.agrid__cell + .agrid__cell { box-shadow: inset 1px 0 0 var(--line); }
+/* The third fact is a link, not a credential, so it gets its own full-width
+   row under the pair rather than a third column that would squeeze all three. */
+.agrid__cell + .agrid__cell--wide {
+  grid-column: 1 / -1;
+  padding-block: clamp(7px, 0.9vh, 10px);
+  box-shadow: inset 0 1px 0 var(--line);
+}
+.agrid__cell-go {
+  flex: 0 0 auto;
+  margin-left: auto;
+  color: var(--line-strong);
+  transition: color 220ms var(--ease-out), transform 220ms var(--ease-out);
+}
+.agrid__cell--wide:hover .agrid__cell-go { color: var(--orange); transform: translate(2px, -2px); }
+.agrid__cell-mark {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: clamp(30px, 2.3vw, 38px);
+  height: clamp(30px, 2.3vw, 38px);
+  border-radius: 10px;
+  color: var(--orange);
+  background: rgba(255, 122, 26, 0.10);
+  box-shadow: inset 0 0 0 1px rgba(255, 122, 26, 0.22);
+}
+.agrid__cell-mark--img { background: var(--white); box-shadow: inset 0 0 0 1px var(--line-strong); }
+/* The HLA mark is a full-bleed gradient logo - an orange wash behind it reads
+   as a second brand colour, so its tile is bare. */
+.agrid__cell-mark--plain { background: none; box-shadow: none; }
+.agrid__cell-mark img { width: 78%; height: 78%; object-fit: contain; }
+.agrid__cell-copy { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.agrid__cell-title {
+  display: block;
+  font-size: clamp(12px, 0.8vw, 14.5px);
+  font-weight: 700;
+  letter-spacing: -0.008em;
+  line-height: 1.2;
+  color: var(--navy);
+}
+.agrid__cell-meta {
+  font-size: clamp(10px, 0.62vw, 11.5px);
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+[data-theme='dark'] .agrid__cell-mark--img { background: #F4F4ED; }
+
+/* Between the rail breakpoint and a wide desktop the bar has ~500px for two
+   facts, so the cells tighten to keep their titles short. */
+@media (min-width: 1100px) and (max-width: 1640px) {
+  .agrid__cell { gap: 9px; padding-inline: clamp(10px, 0.8vw, 14px); }
+  .agrid__cell-title { font-size: clamp(11.5px, 0.78vw, 13.5px); }
+  .agrid__cell-meta { font-size: 10px; }
+}
+
+/* Dark theme: the mark tiles stay a light plate on purpose. Brand marks are
+   drawn for light backgrounds and several of these are monochrome black, so
+   inverting the tile would erase them. */
+[data-theme='dark'] .agrid__mark {
+  background: #F4F4ED;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    0 2px 6px -3px rgba(0, 0, 0, 0.6);
+}
+
+/* ---------- Right: the illustration ----------
+   Bottom-aligned so the art sits on the floor of the sheet rather than floating in
+   the middle of it, and pulled into the sheet's corner by the glass padding
+   so the art gains that much size instead of leaving a margin of empty
+   gradient. The art has a transparent background and already carries the
+   site's navy and blue, so it needs no plate behind it. */
+.agrid__portrait {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  min-height: 0;
+  min-width: 0;
+  margin: 0 calc(-1 * clamp(14px, 1.4vw, 24px)) calc(-1 * clamp(14px, 2vh, 24px)) 0;
+}
+.agrid__portrait img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: bottom right;
+}
+
+/* ---------- Below the shell ---------- */
+@media (max-width: 1099px) {
+  .agrid__glass { display: flex; flex-direction: column; gap: 20px; }
+  .agrid__copy { padding-left: 0; }
+  .agrid__lead { max-width: none; }
+  /* The corner pull is a two-column move; stacked, it just runs the art off
+     the right edge of the sheet. */
+  .agrid__portrait { order: -1; height: min(38vh, 300px); margin: 0; justify-content: center; }
+  .agrid__portrait img { object-position: bottom center; }
+}
+@media (max-width: 720px) {
+  .agrid__bar { grid-template-columns: minmax(0, 1fr); }
+  .agrid__cell + .agrid__cell { box-shadow: inset 0 1px 0 var(--line); }
+}
+@media (max-width: 560px) {
+  /* The index has no room to earn its column at this width. */
+  .agrid__cap { grid-template-columns: calc(5 * var(--tile) - 4 * var(--overlap) + var(--overlap)) minmax(0, 1fr); }
+  .agrid__cap-index { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agrid__mark,
+  .agrid__cap:hover .agrid__mark { transform: none; transition: none; }
+}
+
+/* Phone type floor. */
+@media (max-width: 639px) {
+  .agrid__cell-meta { font-size: 11.5px; }
+}

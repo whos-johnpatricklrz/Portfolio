@@ -1,0 +1,521 @@
+/* Fontsource Poppins - self-hosted, latin subset only (drops devanagari and
+   latin-ext to keep the bundle small). Weights 400 / 500 / 600 / 700 match
+   the four that actually render on this site. */
+@import '@fontsource/poppins/latin-400.css';
+@import '@fontsource/poppins/latin-500.css';
+@import '@fontsource/poppins/latin-600.css';
+@import '@fontsource/poppins/latin-700.css';
+
+/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+html {
+  /* Native smooth-scroll for anchor clicks. Touch devices skip Lenis
+     (see useLenis.ts) and fall back to this. Desktop's Lenis-driven
+     handler intercepts the click before this matters. */
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+body {
+  font-family: var(--font-display);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  background: var(--cream);
+  color: var(--navy);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  /* Fade the page in on every load. On first visit this plays behind
+     the intro overlay (invisible). On refresh it's the entrance animation. */
+  animation: page-fadein 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes page-fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+#root {
+  isolation: isolate;
+}
+
+img, svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Skip link - hidden until focused */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  padding: 12px 20px;
+  background: var(--navy);
+  color: var(--white);
+  border-radius: 8px;
+  z-index: 100;
+  transition: top var(--dur-fast) var(--ease-out);
+}
+.skip-link:focus-visible {
+  top: 16px;
+}
+
+/* Visually hidden utility for screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============================================
+   HERO CANVAS - animated WebGL contour background
+   Dropped in verbatim from extracted-hero-bg/BACKGROUND-EXPORT/hero-canvas.css
+   ============================================ */
+.hero-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  /* Cream fallback so the page reads as light even if WebGL hasn't
+     painted yet (mobile GPUs sometimes show black flash before the
+     shader's first frame, or fail entirely on weak devices). The
+     shader paints on top once it's ready. */
+  background: var(--cream);
+}
+
+main > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* These sections were written as light type on a dark ground back when the
+   contour shader inverted underneath them as you scrolled. It does not any
+   more - the page is dark or light, never both - so they carry their own
+   ground instead of asking the background to become one. Same navy in both
+   themes: their type is light either way. */
+.dark-section,
+.dark-section-alt {
+  background-color: var(--panel-dark);
+}
+
+/* ============================================
+   INTRO OVERLAY - "The First Drop"
+   One orange drop falls onto a dark surface; the
+   ripples settle into topographic contour rings -
+   the same language as the live shader background
+   the reveal hands off to:
+     drop    teardrop accelerates in, squashes on
+             impact with a white-hot flash
+     ripple  six cream contour rings draw on
+             (stroke-dashoffset), widening delays +
+             wobble; ring 3's orange twin persists
+     stamp   mark springs in (overshoot), wordmark
+             tracks-in 120ms later, sub-line rises
+     reveal  orange disc floods out FROM the impact
+             point, then the sheet slow-fades away -
+             hero cross-reveals beneath it
+   CSS-only so it plays on first paint. Reveal
+   starts at T = 2.3s (flood 280ms, fade 900ms);
+   fully clear ~3.52s, unmount 3.65s.
+   useScrollFX.buildHero is synced to T = 2.3s.
+   ============================================ */
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+}
+/* The slow fade - once the flood has covered the viewport (280ms), the whole
+   orange sheet dissolves gently over the hero already rising beneath it. */
+.intro--leaving {
+  /* ease-in-out, not ease-out: holds the orange a beat, then dissolves at a
+     steady, unhurried pace - ease-out dumps most of the fade in the first
+     200ms and reads as a cut. */
+  animation: intro-fade-out 1000ms cubic-bezier(0.45, 0, 0.55, 1) 320ms forwards;
+}
+@keyframes intro-fade-out {
+  to { opacity: 0; }
+}
+
+/* Dark still surface. A faint warm radial at the impact point keeps the
+   stage from reading dead flat. */
+.intro__stage {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 55%, rgba(255, 122, 26, 0.08), transparent 55%),
+    var(--navy-ink);
+}
+
+/* Square scene mapping the 600x600 viewBox, centered. Sized in vmin so the
+   ripple field breathes on any viewport; SVG user units scale with it. */
+.intro__scene {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(78vmin, 560px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+}
+.intro__ripple {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* ── The drop ───────────────────────────────────────────────────
+   transform list reads right-to-left: translate the fall FIRST, then squash
+   around the impact point (transform-origin in viewBox units) so the bulb
+   stays planted on the surface as it flattens. */
+.intro__drop {
+  fill: var(--orange);
+  transform-box: view-box;
+  transform-origin: 300px 330px;
+  opacity: 0;
+  animation: intro-drop 580ms forwards;
+}
+@keyframes intro-drop {
+  0% {
+    opacity: 1;
+    transform: scale(1, 1) translateY(0);
+    animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+  }
+  78% {
+    opacity: 1;
+    transform: scale(1, 1) translateY(226px);
+    animation-timing-function: cubic-bezier(0.2, 0.9, 0.3, 1.3);
+  }
+  88% { opacity: 1; transform: scale(1.45, 0.4) translateY(226px); }
+  100% { opacity: 0; transform: scale(1.7, 0.28) translateY(226px); }
+}
+
+/* Impact flash - tiny, hot, gone. */
+.intro__flash {
+  fill: var(--white);
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  transform: scale(0.2);
+  animation: intro-flash 140ms ease-out 450ms forwards;
+}
+@keyframes intro-flash {
+  0%   { opacity: 0; transform: scale(0.2); }
+  35%  { opacity: 1; transform: scale(1.6); }
+  100% { opacity: 0; transform: scale(0.3); }
+}
+
+/* ── The ripple rings ───────────────────────────────────────────
+   Each ring starts fully undrawn (dashoffset = its own circumference, set as
+   attributes in the TSX), slightly small, slightly rotated; the shared "to"
+   keyframe settles everything at once. --ring-o dims outward - ripples
+   dissipate as they propagate. Delays widen outward (90/95/105/120/130ms
+   gaps) for the same reason: uniform stagger reads as template work. */
+.intro__ring {
+  stroke: var(--cream);
+  stroke-width: 1.5;
+  fill: none;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: intro-ring 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.intro__ring--1 { --ring-o: 0.95; transform: scale(0.85) rotate(1.2deg);  animation-delay: 500ms; }
+.intro__ring--2 { --ring-o: 0.9;  transform: scale(0.85) rotate(-1.5deg); animation-delay: 590ms; }
+.intro__ring--3 { --ring-o: 0.85; transform: scale(0.85) rotate(1.2deg);  animation-delay: 685ms; }
+.intro__ring--4 { --ring-o: 0.72; transform: scale(0.85) rotate(-1.5deg); animation-delay: 790ms; }
+.intro__ring--5 { --ring-o: 0.6;  transform: scale(0.85) rotate(1.2deg);  animation-delay: 910ms; }
+.intro__ring--6 { --ring-o: 0.45; transform: scale(0.85) rotate(-1.5deg); animation-delay: 1040ms; }
+@keyframes intro-ring {
+  to {
+    opacity: var(--ring-o);
+    stroke-dashoffset: 0;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Ring 3's orange twin - the one signal accent. Draws hot over its cream
+   sibling, then dims to a persistent glow that is still on screen when the
+   orange flood arrives, so the flood color already lives in the topography. */
+.intro__ring-accent {
+  stroke: var(--orange);
+  stroke-width: 2;
+  fill: none;
+  opacity: 0;
+  animation: intro-ring-accent 1050ms forwards 1150ms;
+}
+@keyframes intro-ring-accent {
+  0% {
+    opacity: 0;
+    stroke-dashoffset: 698;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  10%  { opacity: 0.9; }
+  57%  { opacity: 0.9; stroke-dashoffset: 0; }
+  100% { opacity: 0.35; stroke-dashoffset: 0; }
+}
+
+/* ── Brand lockup ───────────────────────────────────────────────
+   HTML for crisp text. Mark inside the inner rings above the impact point;
+   wordmark tracks-in 120ms behind the mark's spring - two arrival
+   personalities, deliberately offset. Decorative, NOT a document heading. */
+.intro__lockup {
+  position: absolute;
+  left: 50%;
+  top: 34%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  z-index: 2;
+}
+.intro__mark {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-circle);
+  object-fit: contain;
+  background: var(--white);
+  padding: 8px;
+  box-shadow: 0 12px 32px -14px rgba(6, 12, 26, 0.5);
+  opacity: 0;
+  animation: intro-mark 450ms cubic-bezier(0.34, 1.56, 0.64, 1) 1300ms forwards;
+}
+@keyframes intro-mark {
+  from { opacity: 0; transform: translateY(8px) scale(0.6); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.intro__word {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 4vw, 30px);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--cream);
+  opacity: 0;
+  letter-spacing: 0.12em;
+  animation: intro-word 430ms cubic-bezier(0.22, 1, 0.36, 1) 1420ms forwards;
+}
+@keyframes intro-word {
+  from { opacity: 0; transform: translateY(12px); letter-spacing: 0.12em; }
+  to   { opacity: 1; transform: translateY(0); letter-spacing: 0.04em; }
+}
+.intro__tag {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-align: center;
+  color: var(--cream);
+  opacity: 0;
+  animation: intro-tag 400ms var(--ease-out) 1550ms forwards;
+}
+@keyframes intro-tag {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 0.6; transform: translateY(0); }
+}
+
+/* ── The flood ──────────────────────────────────────────────────
+   Orange disc anchored at the impact point (just below viewport center -
+   the ripple origin is the story, so the reveal grows from it, not from
+   dead center). Covers the viewport in 280ms, then the wipe on .intro
+   takes over. */
+.intro__flood {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + min(3.9vmin, 28px));
+  width: 220vmax;
+  height: 220vmax;
+  margin: -110vmax 0 0 -110vmax;
+  border-radius: 50%;
+  /* Burnt orange, not the bright accent: a full-viewport flash of #FF7A1A is
+     an eye-strain / photosensitivity risk, so the flood uses the darker ink
+     tone and lets the accents stay bright at small sizes only. */
+  background: var(--orange-ink);
+  transform: scale(0);
+  z-index: 3;
+  will-change: transform;
+}
+.intro--leaving .intro__flood {
+  animation: intro-flood 280ms cubic-bezier(0.7, 0, 0.84, 0) forwards;
+}
+@keyframes intro-flood {
+  to { transform: scale(1); }
+}
+
+/* ── Reduced motion: the composed final frame, no choreography ──
+   Rings + accent + lockup at their settled states; fade in, hold, fade out
+   (React swaps the classes on the same schedule). */
+.intro--reduced {
+  animation: none;
+  transition: opacity 400ms var(--ease-out);
+}
+.intro--reduced.intro--leaving { opacity: 0; }
+.intro--reduced .intro__drop,
+.intro--reduced .intro__flash,
+.intro--reduced .intro__flood { display: none; }
+.intro--reduced .intro__ring {
+  animation: intro-fade-static 200ms var(--ease-out) forwards;
+  stroke-dashoffset: 0;
+  transform: none;
+}
+.intro--reduced .intro__ring-accent {
+  animation: intro-fade-static 200ms var(--ease-out) forwards;
+  stroke-dashoffset: 0;
+  --ring-o: 0.35;
+}
+.intro--reduced .intro__mark,
+.intro--reduced .intro__word,
+.intro--reduced .intro__tag {
+  animation: intro-fade-static 200ms var(--ease-out) forwards;
+  transform: none;
+  letter-spacing: 0.04em;
+}
+.intro--reduced .intro__mark { --ring-o: 1; }
+.intro--reduced .intro__word { --ring-o: 1; }
+.intro--reduced .intro__tag { --ring-o: 0.6; }
+@keyframes intro-fade-static {
+  to { opacity: var(--ring-o, 1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro { animation: none !important; transition: opacity 400ms var(--ease-out); }
+  .intro--leaving { opacity: 0; transform: none; }
+  .intro__drop,
+  .intro__flash,
+  .intro__flood { display: none !important; }
+  .intro__ring,
+  .intro__ring-accent {
+    animation: intro-fade-static 200ms var(--ease-out) forwards !important;
+    stroke-dashoffset: 0;
+    transform: none;
+  }
+  .intro__ring-accent { --ring-o: 0.35; }
+  .intro__mark,
+  .intro__word,
+  .intro__tag {
+    animation: intro-fade-static 200ms var(--ease-out) forwards !important;
+    transform: none;
+    letter-spacing: 0.04em;
+  }
+  .intro__mark, .intro__word { --ring-o: 1; }
+  .intro__tag { --ring-o: 0.6; }
+}
+
+/* ============================================
+   CURSOR RING
+   One lagged ring trailing the native cursor
+   (which stays visible - see CursorRing.tsx).
+   White + difference blend reads near-black on
+   the cream shader and near-white on navy-ink,
+   so one element works on every surface.
+   ============================================ */
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--white);
+  border-radius: var(--radius-circle);
+  background: transparent;
+  mix-blend-mode: difference;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0;
+  will-change: transform;
+}
+.cursor-ring__label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  /* Raw #000 is correct here, not a palette violation: it is a blend-math
+     operand. Under difference, black-on-white-disc inverts to light text
+     on a dark disc over cream, dark text on a light disc over navy-ink. */
+  color: #000;
+  opacity: 0;
+}
+
+/* ============================================
+   SCROLL REVEAL
+   Sections start hidden and slide up into
+   view as they enter the viewport.
+   IntersectionObserver adds .is-revealed.
+   ============================================ */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-reveal].is-revealed {
+  opacity: 1;
+  /* transform: none, NOT translateY(0). Even translateY(0) creates a CSS
+     stacking context that breaks position:fixed children (e.g. the Funnels
+     modal). transform: none removes the stacking context entirely once
+     the reveal animation completes. */
+  transform: none;
+}
+
+/* ---------- Theme sweep ----------
+   The theme switch grows out of the toggle button: the new snapshot is a
+   circle centred on the button (--sweep-x/y, set by lib/theme.ts) that
+   expands until it reaches the farthest corner (--sweep-r). Default
+   cross-fades are disabled so the edge stays hard. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html[data-theme-sweep]::view-transition-new(root) {
+  animation: theme-sweep 1200ms cubic-bezier(0.55, 0, 0.15, 1) both;
+}
+@keyframes theme-sweep {
+  from { clip-path: circle(0px at var(--sweep-x, 50%) var(--sweep-y, 50%)); }
+  to   { clip-path: circle(var(--sweep-r, 150vmax) at var(--sweep-x, 50%) var(--sweep-y, 50%)); }
+}

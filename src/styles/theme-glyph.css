@@ -1,0 +1,37 @@
+/* ThemeGlyph - moon <-> sun morph. Every part animates transform/opacity
+   only; the whole mark turns a quarter so the crescent's horn leads the
+   swing into the sun. The cutter is painted in the host button's background
+   (--tg-bg) so it reads as a bite out of the disc. */
+.tg {
+  display: block;
+  overflow: hidden;
+  transform: rotate(0deg);
+  transition: transform 600ms var(--ease-spring);
+}
+.tg__cut,
+.tg__disc,
+.tg__rays {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    transform 600ms var(--ease-spring),
+    opacity 300ms var(--ease-out);
+}
+.tg__cut { fill: var(--tg-bg, var(--white)); }
+.rail__theme { --tg-bg: var(--white); }
+.theme-btn { --tg-bg: var(--white); }
+[data-theme='dark'] .theme-btn { --tg-bg: var(--paper); }
+
+/* light = crescent: cutter sits up-right on the disc, rays hidden */
+.tg__cut { transform: translate(4.5px, -4.5px); }
+.tg__rays { opacity: 0; transform: rotate(-60deg) scale(0.55); }
+
+/* dark = sun: cutter slides clear, disc shrinks, rays fan open */
+.tg[data-theme='dark'] { transform: rotate(90deg); }
+.tg[data-theme='dark'] .tg__cut { transform: translate(16px, -16px); }
+.tg[data-theme='dark'] .tg__disc { transform: scale(0.66); }
+.tg[data-theme='dark'] .tg__rays { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tg, .tg__cut, .tg__disc, .tg__rays { transition: none; }
+}

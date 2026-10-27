@@ -1,0 +1,370 @@
+/* ============================================
+   SERVICES - one glass sheet
+   Head, then the glass with three bands: the three-step method on a dark plate,
+   the five service cards with their marks, and the booking workflow scaled
+   below. The page scrolls: every card shows all of its bullets.
+   ============================================ */
+/* The workflow section carries data-reveal for the scrolling views; nothing
+   observes it here, so it would sit at opacity 0 forever. */
+.sgrid [data-reveal] { opacity: 1 !important; transform: none !important; }
+
+@media (min-width: 1100px) {
+  .sgrid { padding-top: clamp(20px, 3vh, 34px); gap: clamp(14px, 2vh, 24px); }
+  .sgrid .pgrid__title { font-size: clamp(26px, 2vw, 40px); }
+  .sgrid .pgrid__lede { font-size: clamp(13px, 0.9vw, 16px); }
+  .sgrid { height: auto; }
+  .sgrid__glass { height: auto; grid-template-rows: auto auto auto; }
+  .sgrid__flow-main { height: clamp(380px, 50vh, 540px); }
+}
+/* The bands need more air than the Home sheet's default gap - each one is
+   its own object (a dark plate, a card row, a window) and at the default
+   spacing they read as one stack. */
+.sgrid__glass { min-height: 0; gap: clamp(26px, 3.6vh, 48px); }
+.sgrid__stages, .sgrid__stage-chips, .sgrid__services, .sgrid__bullets { list-style: none; margin: 0; padding-left: 0; }
+
+/* ---------- The method ---------- */
+.sgrid__method {
+  /* Light plate by default; the dark theme re-pins every token below. */
+  --ink: var(--navy);
+  --ink-muted: var(--muted);
+  --ink-line: rgba(11, 30, 63, 0.10);
+  --ink-plate: rgba(11, 30, 63, 0.035);
+  --ink-chip: rgba(11, 30, 63, 0.05);
+  --ink-ghost: rgba(11, 30, 63, 0.06);
+  --ink-eyebrow: var(--orange-ink);
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(200px, 0.7fr) minmax(0, 2.6fr);
+  gap: clamp(18px, 2vw, 36px);
+  padding: clamp(14px, 1.8vh, 20px) clamp(16px, 1.6vw, 24px);
+  border-radius: 20px;
+  background:
+    radial-gradient(600px 220px at 0% 0%, rgba(255, 122, 26, 0.12), transparent 70%),
+    radial-gradient(500px 260px at 100% 100%, rgba(24, 56, 140, 0.10), transparent 70%),
+    var(--white);
+  color: var(--ink);
+  box-shadow:
+    inset 0 0 0 1px var(--line),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 30px 60px -40px rgba(6, 12, 26, 0.35);
+  overflow: hidden;
+}
+[data-theme='dark'] .sgrid__method {
+  --ink: #EDF0F6;
+  --ink-muted: rgba(237, 240, 246, 0.62);
+  --ink-line: rgba(255, 255, 255, 0.10);
+  --ink-plate: rgba(255, 255, 255, 0.045);
+  --ink-chip: rgba(255, 255, 255, 0.07);
+  --ink-ghost: rgba(255, 255, 255, 0.05);
+  --ink-eyebrow: var(--orange);
+  background:
+    radial-gradient(600px 220px at 0% 0%, rgba(255, 122, 26, 0.22), transparent 70%),
+    radial-gradient(500px 260px at 100% 100%, rgba(24, 56, 140, 0.45), transparent 70%),
+    var(--panel-dark);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 30px 60px -40px rgba(6, 12, 26, 0.9);
+}
+.sgrid__method-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  align-self: center;
+}
+.sgrid__method-eyebrow {
+  font-size: var(--fs-eyebrow);
+  font-weight: 600;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--ink-eyebrow);
+}
+.sgrid__method-title {
+  font-size: clamp(22px, 1.6vw, 30px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+  color: var(--ink);
+}
+.sgrid__method-title span { color: var(--ink-muted); font-weight: 600; }
+.sgrid__method-sub {
+  max-width: 34ch;
+  font-size: clamp(12.5px, 0.8vw, 14px);
+  line-height: 1.55;
+  color: var(--ink-muted);
+}
+
+.sgrid__stages {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+  min-width: 0;
+}
+.sgrid__stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 12px 14px 12px;
+  border-radius: 16px;
+  background: var(--ink-plate);
+  box-shadow: inset 0 0 0 1px var(--ink-line);
+  overflow: visible;
+}
+/* The wire between stages, and the signal that hops it. The signal is a dot
+   on transform so the plate never relayouts. Each hop is delayed by the
+   stage index, so the three fire in order. */
+.sgrid__stage + .sgrid__stage::before {
+  content: '';
+  position: absolute;
+  top: 31px;
+  left: -32px;
+  width: 32px;
+  height: 0;
+  border-top: 2px dashed rgba(255, 122, 26, 0.45);
+}
+.sgrid__stage + .sgrid__stage::after {
+  content: '';
+  position: absolute;
+  top: 27px;
+  left: -32px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--orange);
+  box-shadow: 0 0 10px rgba(255, 122, 26, 0.9);
+  animation: sgrid-hop 2.4s var(--ease-out) infinite;
+  animation-delay: calc(var(--i, 1) * 0.8s);
+}
+@keyframes sgrid-hop {
+  0%   { transform: translateX(0);    opacity: 0; }
+  12%  { opacity: 1; }
+  45%  { transform: translateX(24px); opacity: 1; }
+  60%  { transform: translateX(24px); opacity: 0; }
+  100% { transform: translateX(24px); opacity: 0; }
+}
+.sgrid__stage-ghost {
+  position: absolute;
+  right: 8px;
+  top: -6px;
+  font-size: 66px;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  color: var(--ink-ghost);
+  pointer-events: none;
+}
+.sgrid__stage-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: rgba(255, 122, 26, 0.14);
+  color: var(--orange);
+  box-shadow: inset 0 0 0 1px rgba(255, 122, 26, 0.28);
+  animation: sgrid-lit 2.4s var(--ease-out) infinite;
+  animation-delay: calc(var(--i, 0) * 0.8s);
+}
+@keyframes sgrid-lit {
+  0%, 100% { transform: none; }
+  10%      { transform: translateY(-2px) scale(1.06); }
+  40%      { transform: none; }
+}
+.sgrid__stage-label {
+  margin-top: 8px;
+  font-size: clamp(18px, 1.2vw, 22px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.sgrid__stage-body {
+  margin-top: 4px;
+  font-size: clamp(12px, 0.72vw, 13px);
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+.sgrid__stage-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+.sgrid__stage-chip {
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--ink-chip);
+  box-shadow: inset 0 0 0 1px var(--ink-line);
+}
+
+/* ---------- The offers ---------- */
+.sgrid__offers {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.2vh, 12px);
+  min-width: 0;
+}
+.sgrid__offers-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  text-align: center;
+  gap: 12px;
+  padding: 0 4px;
+}
+.sgrid__offers-title {
+  font-size: clamp(16px, 1.15vw, 20px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--navy);
+}
+.sgrid__offers-sub {
+  font-size: clamp(12px, 0.8vw, 14px);
+  color: var(--muted);
+}
+@media (min-width: 1100px) {
+  .sgrid__services {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-rows: none;
+  }
+}
+.sgrid__service { list-style: none; }
+/* Every row lines up across the five cards: the description and each bullet
+   reserve two lines whether they need them or not. */
+.sgrid__service .bento__desc { min-height: calc(2 * 1.4em); }
+.sgrid__service-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.sgrid__service-index {
+  padding-top: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--orange-ink);
+}
+.sgrid__chip {
+  align-self: flex-start;
+  margin-top: 8px;
+  padding: 4px 9px;
+  border-radius: var(--radius-pill);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--orange-ink);
+  background: rgba(255, 122, 26, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(255, 122, 26, 0.22);
+}
+.sgrid__bullets {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 10px;
+}
+.sgrid__bullet {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: clamp(11.5px, 0.68vw, 13px);
+  line-height: 1.35;
+  color: var(--navy);
+}
+.sgrid__bullet svg { flex: none; margin-top: 2px; color: var(--orange); }
+
+/* ---------- The workflow ---------- */
+.sgrid__flow {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.6vh, 18px);
+  min-height: 0;
+  min-width: 0;
+}
+/* Centred, with the tool chips on their own row underneath - the earlier
+   copy-left / chips-right split made the band read as two unrelated things. */
+.sgrid__flow-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 0 4px;
+}
+.sgrid__flow-copy { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; }
+.sgrid__flow-main { display: flex; min-height: 0; min-width: 0; }
+.sgrid__flow .autopilot--compact { flex: 1 1 auto; display: flex; flex-direction: column; }
+.sgrid__flow .autopilot--compact .autopilot__caption,
+.sgrid__flow .autopilot--compact .autopilot__tools { display: none; }
+.sgrid__flow-eyebrow {
+  font-size: var(--fs-eyebrow);
+  font-weight: 600;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--orange-ink);
+}
+.sgrid__flow-title {
+  font-size: clamp(20px, 1.5vw, 28px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--navy);
+}
+.sgrid__flow-sub {
+  max-width: 60ch;
+  font-size: clamp(13px, 0.85vw, 15px);
+  line-height: 1.5;
+  color: var(--muted);
+}
+.sgrid__flow-tools {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  padding-left: 0;
+  list-style: none;
+}
+.sgrid__flow-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--navy);
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.sgrid__flow-tool svg { color: var(--orange); }
+
+/* ---------- Below the shell ---------- */
+@media (max-width: 1099px) {
+  .sgrid__method { grid-template-columns: minmax(0, 1fr); }
+  .sgrid__stages { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .sgrid__stage + .sgrid__stage::before,
+  .sgrid__stage + .sgrid__stage::after { display: none; }
+}
+@media (min-width: 640px) and (max-width: 1099px) {
+  .sgrid__stages { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 639px) {
+  .sgrid__services { grid-template-columns: minmax(0, 1fr); }
+  .sgrid__offers-head { flex-direction: column; gap: 2px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sgrid__stage + .sgrid__stage::after { animation: none; opacity: 1; transform: translateX(12px); }
+  .sgrid__stage-icon { animation: none; }
+}
+
+/* Phone type floor. */
+@media (max-width: 639px) {
+  .sgrid__stage-chip, .sgrid__service-index, .sgrid__chip { font-size: 12px; }
+}

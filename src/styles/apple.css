@@ -1,0 +1,426 @@
+/* ============================================
+   APPLE DESIGN PASS - an overlay, not a rewrite
+   Every rule here is one principle from Apple's WWDC design talks
+   (Designing Fluid Interfaces, The Details of UI Typography, Principles of
+   Great Design) translated onto the existing shell. It loads after every
+   section sheet and before perf.css, so it wins on equal specificity and
+   the perf tiers still get the last word on anything they switch off.
+
+   Remove the import in main.tsx and delete this file to revert the whole
+   pass; nothing else was touched.
+
+   Sections:
+     1  Motion tokens     critically damped springs, response 0.3-0.4s
+     2  Type              system font, size-specific tracking + leading
+     3  Response          feedback on pointer-down, never only on release
+     4  Materials         the rail as a translucent structural layer
+     5  Sidebar           filled selection, no slide, no hairline box
+     6  Cards             thinner materials, restrained hover, no glow
+     7  Glass plate       heavier blur + a bright edge catching light
+     8  Preferences       reduced motion / transparency / contrast
+   ============================================ */
+
+/* ---------- 1. Motion tokens ----------
+   Apple starts most UI at damping 1.0 (no overshoot) and reserves bounce
+   for gestures that carried momentum. Nothing on this page is flicked, so
+   the overshoot curve that every hover used is replaced by a critically
+   damped one. Response 0.3-0.4s: --dur-med lands in the middle. */
+:root {
+  --ease-spring: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-out: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --dur-fast: 140ms;
+  --dur-med: 340ms;
+  --dur-slow: 520ms;
+  --radius-card: 22px;
+}
+
+/* ---------- 2. Type ----------
+   "Default to the platform's system font before a custom face; it already
+   ships optical sizing, tracking tables, and legibility tuning." SF Pro on
+   Apple hardware, Segoe UI Variable on Windows, Poppins stays as the
+   fallback so the brand face is never more than one step away. */
+:root {
+  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+    system-ui, 'Segoe UI Variable Display', 'Segoe UI', 'Poppins', sans-serif;
+  --ls-display: -0.028em;
+  --ls-eyebrow: 0.08em;
+  --lh-tight: 1.02;
+  --lh-heading: 1.15;
+  --lh-body: 1.5;
+}
+body {
+  font-optical-sizing: auto;
+  letter-spacing: 0;
+}
+
+/* Tracking is size-specific: large text tightens, small text opens up.
+   .boot__title is the intro's copy of the headline and must stay identical
+   (boot.css: "change one, change both") - it is sized to the real h1's
+   measured width, so any tracking difference makes it wrap. */
+.home__title,
+.boot__title {
+  letter-spacing: -0.032em;
+  line-height: 1.04;
+  font-weight: 700;
+}
+.view__title { letter-spacing: -0.025em; line-height: 1.1; }
+.rail__name { letter-spacing: -0.022em; font-weight: 700; }
+.home__tools-label { letter-spacing: -0.018em; }
+
+/* Vibrancy: type sitting directly on the animated contour ground is not flat
+   gray. A touch more weight and ink so it holds against a changing backdrop. */
+.home__lede {
+  font-weight: 500;
+  color: color-mix(in srgb, var(--navy) 74%, transparent);
+  letter-spacing: 0.002em;
+  line-height: 1.5;
+}
+
+/* Small text opens: eyebrows lose the wide caps tracking, captions gain a
+   hair of space. Card names are sentence case - the caps-and-tracking
+   treatment was hierarchy by decoration; weight and size do it instead. */
+.view__eyebrow,
+.home__tools-eyebrow {
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+.bento__title {
+  text-transform: none;
+  letter-spacing: -0.012em;
+  font-weight: 600;
+  font-size: clamp(16px, 1.15vw, 19px);
+  line-height: 1.15;
+}
+.bento__desc {
+  letter-spacing: 0.004em;
+  line-height: 1.45;
+}
+.bento__offer-title { letter-spacing: 0; }
+.bento__offer-num,
+.bento__review-work,
+.bento__badge-tag,
+.bento__chip { letter-spacing: 0.01em; }
+.rail__handle,
+.rail__copy { letter-spacing: 0.004em; }
+.rail__link { letter-spacing: -0.006em; font-size: 16.5px; }
+
+/* ---------- 3. Response ----------
+   Feedback lives on the press. Highlight on pointer-down, commit on release;
+   100ms so the press reads instant and the release settles on the spring. */
+.home__cta:active,
+.rail__link:active,
+.rail__social:active,
+.rail__theme:active,
+.bento__card:active,
+.nav__theme:active,
+.a11y__button:active {
+  transform: scale(0.97) !important;
+  transition-duration: 100ms;
+}
+.bento__card:active .bento__icon { transform: none; }
+
+/* ---------- 4. Materials ----------
+   Structural regions get the heavier material: the rail is a translucent
+   layer the contour field scrolls under, with a bright top edge where light
+   catches it, not a transparent column of controls floating in space. */
+@media (min-width: 1100px) {
+  /* The material is a pseudo-element, not the rail's own background, for one
+     reason: boot.css holds the intro back by fading `.rail__inner > *`, the
+     children, never the column. A background on `.rail` would paint at full
+     strength under the intro from the first frame. A layer of its own can be
+     held back with the rest and arrive on the same beat. Fixed, not absolute:
+     the rail is a scroll container on short viewports and the plate must
+     cover the column, not travel with its content. */
+  .rail::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--rail-w);
+    height: 100dvh;
+    z-index: -1;
+    pointer-events: none;
+    /* Solid, not a blurred material: a 312px x full-height blur over the
+       animating shader cost a re-blur every frame (see home.css). */
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 30%),
+      var(--paper);
+    box-shadow:
+      inset -1px 0 0 var(--line),
+      inset 0 1px 0 rgba(255, 255, 255, 0.55),
+      12px 0 40px -32px rgba(6, 12, 26, 0.35);
+    transition: opacity 620ms var(--ease-out);
+  }
+  [data-theme='dark'] .rail::before {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 30%),
+      var(--paper);
+    box-shadow:
+      inset -1px 0 0 var(--line),
+      inset 0 1px 0 rgba(255, 255, 255, 0.07),
+      12px 0 40px -32px rgba(0, 0, 0, 0.7);
+  }
+  /* Held back with the rest of the page while the intro plays. */
+  html.is-intro .rail::before { opacity: 0; }
+
+  /* Scroll edge, not a hard divider: the panel's content fades under a soft
+     mask at the top edge instead of meeting the viewport with a cut. */
+  .shell__panel:not([data-fixed='true']) {
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 18px, #000 calc(100% - 18px), transparent);
+            mask-image: linear-gradient(to bottom, transparent, #000 18px, #000 calc(100% - 18px), transparent);
+  }
+}
+
+/* ---------- 5. Sidebar ----------
+   An Apple sidebar selects with a filled tint, sits still on hover, and
+   never draws a hairline box around the active row. Radius 10px: the row is
+   a small surface, so it reads thinner than the 22px cards. */
+@media (min-width: 1100px) {
+  .rail__link {
+    border-radius: 10px;
+    height: clamp(42px, 5.4vh, 48px);
+    gap: 13px;
+    font-weight: 500;
+    color: color-mix(in srgb, var(--navy) 78%, transparent);
+    transition:
+      background var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out),
+      transform 100ms var(--ease-out);
+  }
+  .rail__link svg { opacity: 0.9; }
+  .rail__link:hover {
+    color: var(--navy);
+    background: var(--tint);
+    transform: none;
+    box-shadow: none;
+  }
+  .rail__link.active {
+    color: var(--navy);
+    font-weight: 600;
+    background: var(--tint-strong);
+    box-shadow: none;
+  }
+  .rail__link.active svg { color: var(--orange); }
+
+  /* Round plates on the material lose their drop shadow: two stacked light
+     surfaces collapse legibility, so the plates sit flush with a hairline. */
+  .rail__social,
+  .rail__theme {
+    background: color-mix(in srgb, var(--white) 70%, transparent);
+    box-shadow: inset 0 0 0 1px var(--line);
+    transition:
+      transform var(--dur-med) var(--ease-spring),
+      color var(--dur-fast) var(--ease-out),
+      background var(--dur-fast) var(--ease-out);
+  }
+  .rail__social:hover,
+  .rail__theme:hover {
+    transform: translateY(-1px);
+    background: var(--white);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+  }
+  .rail__nav,
+  .rail__copy { border-top-color: var(--line); }
+}
+
+/* ---------- 6. Cards ----------
+   Bigger surfaces read thicker, so the cards keep a real shadow, but a
+   restrained one - no orange border on hover, no glow under the icon tile,
+   a hairline instead of a heavy stroke. The lift stays because the card is
+   a link and the motion says "this moves when you take it". */
+.bento__card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow:
+    0 1px 1.5px rgba(6, 12, 26, 0.04),
+    0 10px 30px -18px rgba(6, 12, 26, 0.28);
+  transition:
+    transform var(--dur-med) var(--ease-spring),
+    box-shadow var(--dur-med) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+.bento__card:hover {
+  transform: translateY(-2px);
+  border-color: var(--line-strong);
+  box-shadow:
+    0 1px 1.5px rgba(6, 12, 26, 0.05),
+    0 18px 40px -20px rgba(6, 12, 26, 0.38);
+}
+.bento__card:hover .bento__title { color: var(--navy); }
+.bento__icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  box-shadow: none;
+}
+.bento__card:hover .bento__icon { transform: none; }
+.bento__arrow { transform: translate(-3px, 3px); }
+.bento__review,
+.bento__chip {
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.bento__shot { box-shadow: inset 0 0 0 1px var(--line), 0 6px 18px -14px rgba(6, 12, 26, 0.5); }
+.bento__badge-ring {
+  box-shadow: inset 0 0 0 1px var(--line), 0 0 0 6px var(--tint), 0 10px 24px -16px rgba(6, 12, 26, 0.45);
+}
+.bento__card:hover .bento__badge-ring { transform: scale(1.03); }
+.bento__card:hover .bento__photo {
+  transform: rotate(calc((var(--i) - 1) * 11deg)) translateX(calc((var(--i) - 1) * 30px)) translateY(-2px);
+}
+.bento__card:hover .bento__offer { transform: translateX(2px); }
+
+/* The CTA is a solid layer with color on it: press feedback, no drop lift. */
+.home__cta {
+  height: 44px;
+  padding: 0 20px;
+  letter-spacing: -0.006em;
+  box-shadow: 0 1px 2px rgba(6, 12, 26, 0.12), 0 8px 20px -12px rgba(11, 30, 63, 0.35);
+  transition:
+    transform var(--dur-med) var(--ease-spring),
+    box-shadow var(--dur-med) var(--ease-out),
+    background var(--dur-fast) var(--ease-out);
+}
+.home__cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 1px 2px rgba(6, 12, 26, 0.12), 0 12px 26px -12px rgba(11, 30, 63, 0.45);
+}
+
+/* ---------- 7. Glass plate ----------
+   A hairline that is a bright edge on top and a plain line elsewhere. The
+   tools band inside it drops its heavy stroke - one material, one edge.
+   No backdrop-filter: it re-blurred the animating shader every frame (see
+   home.css). */
+.home__glass {
+  box-shadow:
+    inset 0 0 0 1px var(--line),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 24px 60px -36px rgba(6, 12, 26, 0.4);
+}
+[data-theme='dark'] .home__glass {
+  box-shadow:
+    inset 0 0 0 1px var(--line),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 24px 60px -36px rgba(0, 0, 0, 0.75);
+}
+.home .tools-marquee { border-color: var(--line); border-radius: 12px; }
+@media (min-width: 1100px) {
+  .home__tools-head { border-right-color: var(--line); }
+}
+
+/* ---------- 8. Preferences ----------
+   Reduced motion is a gentler equivalent, not silence: the reveal becomes a
+   short cross-fade instead of a 0.01ms cut. tokens.css sets every duration
+   to 0.01ms with !important; this sits later in the cascade so it wins. */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    transform: none !important;
+    transition: opacity 200ms ease !important;
+    transition-duration: 200ms !important;
+  }
+  .bento__card,
+  .rail__link,
+  .rail__social,
+  .rail__theme,
+  .home__cta {
+    transition: background 120ms ease, color 120ms ease, box-shadow 120ms ease !important;
+    transition-duration: 120ms !important;
+  }
+  .bento__card:hover,
+  .rail__social:hover,
+  .rail__theme:hover,
+  .home__cta:hover { transform: none; }
+}
+
+/* Frostier, then solid: raise the material's opacity when the visitor asks
+   for less transparency, and give it a defined edge on high contrast. */
+@media (prefers-reduced-transparency: reduce) {
+  .rail::before,
+  .home__glass {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .rail::before { background: var(--paper); }
+  .home__glass {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 38%),
+      linear-gradient(100deg,
+        rgba(255, 255, 255, 0.97) 0%,
+        rgba(255, 255, 255, 0.93) 42%,
+        rgba(219, 231, 255, 0.95) 76%,
+        rgba(186, 209, 255, 0.96) 100%);
+  }
+  [data-theme='dark'] .home__glass {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 38%),
+      linear-gradient(100deg,
+        rgba(16, 24, 42, 0.96) 0%,
+        rgba(16, 26, 48, 0.94) 42%,
+        rgba(18, 40, 96, 0.94) 76%,
+        rgba(24, 56, 140, 0.93) 100%);
+  }
+}
+@media (prefers-contrast: more) {
+  .rail::before { box-shadow: inset -1px 0 0 var(--line-strong); }
+  .bento__card,
+  .home__glass { border-color: var(--line-strong); box-shadow: inset 0 0 0 1px var(--line-strong); }
+  .rail__link.active { box-shadow: inset 0 0 0 1px var(--line-strong); }
+}
+
+/* ============================================
+   9. PHONES + TABLETS (below the 1100px shell breakpoint)
+   The same principles on the pocket app shell: type sized for a
+   thumb-distance screen and press feedback on the touch targets this sheet
+   styles. The phone's own components (tab bar, QuickMenu, Home's header,
+   stats, explore row, proof card) are owned whole by mobile-app.css.
+   ============================================ */
+@media (max-width: 1099px) {
+  /* ---------- Type: the phone floor ----------
+     Tracking tightens as the headline grows and opens on captions. Phone
+     headlines are 30-40px, so less negative tracking than the 72px desktop
+     line; body sits at 0. Leading tightens on the head, loosens on ledes. */
+  .home__title,
+  .boot__title { letter-spacing: -0.024em; line-height: 1.06; }
+  .pgrid__title,
+  .view__title { letter-spacing: -0.022em; line-height: 1.08; }
+  .home__lede,
+  .pgrid__lede,
+  .view__lede { font-weight: 500; line-height: 1.5; letter-spacing: 0.002em; }
+  .pgrid__eyebrow { letter-spacing: 0.08em; }
+  .hprofile__name { letter-spacing: -0.018em; }
+  .hprofile__handle { letter-spacing: 0.004em; }
+
+  /* ---------- Touch targets: instant, on the press ---------- */
+  .bento__card,
+  .pfilter__btn,
+  .home__cta {
+    transition: transform var(--dur-med) var(--ease-spring),
+                box-shadow var(--dur-med) var(--ease-out),
+                background var(--dur-fast) var(--ease-out),
+                color var(--dur-fast) var(--ease-out);
+  }
+  .bento__card:active,
+  .home__cta:active { transform: scale(0.97); transition-duration: 100ms; }
+  .pfilter__btn:active { transform: scale(0.96); transition-duration: 100ms; }
+  /* Hover lifts do not exist under a thumb; the press is the feedback. */
+  @media (hover: none) {
+    .bento__card:hover,
+    .home__cta:hover { transform: none; }
+  }
+
+  /* ---------- Filter: a soft segmented control ---------- */
+  .pfilter { padding: 3px; gap: 3px; }
+  .pfilter__btn { min-height: 34px; font-size: 13px; letter-spacing: -0.004em; }
+  .pfilter__btn[aria-pressed='true'] {
+    box-shadow: 0 1px 2px rgba(6, 12, 26, 0.08), 0 3px 10px -4px rgba(11, 30, 63, 0.25);
+  }
+}
+
+/* ---------- Tablets (640-1099px): reading measure ----------
+   Between the phone and the shell the page scrolls but has width to spare:
+   ledes get a measure instead of the full line. */
+@media (min-width: 640px) and (max-width: 1099px) {
+  .home__lede,
+  .pgrid__lede,
+  .view__lede { max-width: 60ch; }
+  .bento__card { border-radius: 22px; }
+}

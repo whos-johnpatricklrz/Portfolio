@@ -1,0 +1,3462 @@
+/* ==========================================================================
+   NAVBAR
+   ========================================================================== */
+.nav {
+  position: fixed;
+  top: 32px;
+  transition: top 320ms var(--ease-out);
+  /* Always centered with a stable transform anchor. The pill morph animates
+     width and visual properties - position properties (left, transform) never
+     change, so the morph is a single smooth motion with no layout snap. */
+  left: 50%;
+  transform: translateX(-50%);
+  /* Default width spans the hero's 10vw inset on both sides (matches the
+     hero copy block edge) so the logo and links visually land where they did
+     before the pill was added. */
+  width: clamp(720px, calc(100vw - 2 * clamp(32px, 10vw, 160px)), 1600px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  box-shadow: none;
+  backdrop-filter: blur(0);
+  -webkit-backdrop-filter: blur(0);
+  z-index: 10;
+  /* No will-change: the pill morph fires once when crossing the scroll
+     threshold, so a permanent paint layer for these properties only wastes
+     memory. */
+  transition:
+    top var(--dur-med) var(--ease-out),
+    width var(--dur-slow) var(--ease-out),
+    padding var(--dur-slow) var(--ease-out),
+    background-color var(--dur-slow) var(--ease-out),
+    box-shadow var(--dur-slow) var(--ease-out),
+    border-color var(--dur-slow) var(--ease-out),
+    backdrop-filter var(--dur-slow) var(--ease-out);
+}
+
+/* Scrolled state morphs the nav into a centered navy pill. Only width and
+   surface properties change - position stays put so the motion reads smooth. */
+.nav.is-scrolled {
+  top: 16px;
+  width: min(580px, calc(100vw - 48px));
+  padding: 10px 36px 10px 10px;
+  background: var(--navy);
+  box-shadow: var(--shadow-card);
+  border-color: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Pipe divider between the logo and the links inside the pill. */
+.nav.is-scrolled .nav__logo::after {
+  content: '';
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.nav.is-scrolled .nav__logo {
+  width: 48px;
+  height: 48px;
+  padding: 7px;
+}
+
+.nav.is-scrolled .nav__link {
+  color: var(--white);
+}
+
+.nav.is-scrolled .nav__links {
+  gap: 36px;
+}
+
+.nav__logo {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-circle);
+  background: var(--white);
+  box-shadow: var(--shadow-soft);
+  display: grid;
+  place-items: center;
+  padding: 10px;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    width var(--dur-med) var(--ease-out),
+    height var(--dur-med) var(--ease-out),
+    padding var(--dur-med) var(--ease-out);
+}
+.nav__logo:hover {
+  transform: scale(1.04);
+}
+.nav__logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.nav__links {
+  display: flex;
+  gap: 48px;
+  list-style: none;
+}
+
+.nav__link {
+  position: relative;
+  font-size: var(--fs-nav);
+  font-weight: 500;
+  color: var(--navy);
+  padding: 8px 2px;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.nav__link:hover {
+  color: var(--orange);
+}
+.nav__link[aria-current="page"]::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--orange);
+}
+
+/* When the fixed nav sits over a .dark-section (contact strip and friends),
+   flip the link color to white so it stays legible against the navy shader.
+   The orange hover and active-dot stay unchanged. */
+.nav.is-on-dark .nav__link {
+  color: var(--white);
+}
+.nav.is-on-dark .nav__link:hover {
+  color: var(--orange);
+}
+
+/* Hamburger toggle and dropdown panel are mobile-only chrome. Hidden on
+   desktop so the inline links stay the sole navigation above 720px. */
+.nav__toggle {
+  display: none;
+}
+.nav__menu {
+  display: none;
+}
+
+/* ==========================================================================
+   HERO
+   ========================================================================== */
+.hero {
+  /* dvh so mobile browser chrome doesn't add dead scroll below the fold. */
+  min-height: 100dvh;
+  /* Horizontal inset matches the nav so the name block, socials, and photo
+     share a visual edge with the logo and links above. */
+  padding: 160px clamp(32px, 10vw, 160px) 0;
+  display: grid;
+  /* Tilted toward the photo column so the enlarged portrait has room to
+     dominate without crushing the copy. */
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 24px;
+  align-items: end;
+}
+
+.hero__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 56ch;
+  padding-bottom: 48px;
+}
+
+.hero__display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-display);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-display);
+  color: var(--navy);
+}
+.hero__display-line {
+  display: block;
+}
+
+.hero__accent-bar {
+  width: 80px;
+  height: 4px;
+  background: var(--orange);
+  border-radius: 2px;
+  margin-top: 8px;
+}
+
+.hero__intro {
+  max-width: 56ch;
+}
+
+.hero__eyebrow {
+  display: block;
+  font-size: var(--fs-eyebrow);
+  font-weight: 500;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--orange-ink);
+  margin-bottom: 16px;
+}
+
+.hero__headline {
+  font-size: var(--fs-h3);
+  font-weight: 600;
+  line-height: var(--lh-heading);
+  color: var(--navy);
+  margin-bottom: 20px;
+}
+
+.hero__body {
+  font-size: var(--fs-body);
+  color: var(--muted);
+  line-height: var(--lh-body);
+}
+
+.hero__actions {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.hero__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  /* Bright brand orange - intentionally vibrant here, chosen over
+     the AA-contrast --orange-ink. Do not "fix" this back to --orange-ink. */
+  color: var(--orange);
+  font-weight: 500;
+  font-size: var(--fs-body);
+  padding: 4px 0;
+  transition: gap var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.hero__cta:hover {
+  gap: 16px;
+  color: var(--orange-hover);
+}
+.hero__cta svg {
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+/* Right column - free-floating portrait on the cream shader.
+   No container, no background, no border. The PNG's native alpha renders directly
+   over the shader so the portrait's silhouette reads as part of the composition. A soft
+   drop-shadow tuned to the navy token grounds the figure without looking like a sticker.
+   The wrapper acts as a positioned parent so the GHL certification badge can pin
+   against the top-left corner of the portrait and break slightly outside the bounds. */
+.hero__photo {
+  position: relative;
+  display: block;
+  justify-self: center;
+  align-self: end;
+  width: min(820px, 100%);
+  max-height: 96vh;
+}
+
+.hero__photo-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 86vh;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 40px 60px rgba(11, 30, 63, 0.22));
+}
+
+/* Floating HighLevel certification badge. Pinned against the top-left corner
+   of the portrait wrapper, rotated like a stuck-on pin, and gently floating
+   via a looping translateY. Sits above the portrait via z-index and is
+   pointer-events:none so it never eats hover/click targets below it. */
+.hero__badge {
+  position: absolute;
+  /* Pulled in close to the portrait's upper-left shoulder area so it reads
+     as attached to the portrait, not floating in detached space above it. */
+  top: 96px;
+  left: 48px;
+  width: 160px;
+  height: auto;
+  z-index: 2;
+  pointer-events: none;
+  transform: rotate(-8deg);
+  transform-origin: center center;
+  /* Layered drop-shadows: a deep navy cast for depth, a tight navy contact
+     shadow for the "attached" feel, and a soft cyan bloom that matches the
+     badge's brand color to read as glow. Chained drop-shadow() filters
+     compose to a single GPU-accelerated effect. */
+  filter:
+    drop-shadow(0 24px 40px rgba(11, 30, 63, 0.38))
+    drop-shadow(0 6px 14px rgba(11, 30, 63, 0.22))
+    drop-shadow(0 0 28px rgba(88, 196, 255, 0.55))
+    drop-shadow(0 0 10px rgba(255, 255, 255, 0.4));
+  animation: hero-badge-float 7s ease-in-out infinite;
+  will-change: transform, filter;
+}
+
+@keyframes hero-badge-float {
+  0%, 100% {
+    transform: rotate(-8deg) translateY(0) scale(1);
+    filter:
+      drop-shadow(0 22px 36px rgba(11, 30, 63, 0.38))
+      drop-shadow(0 6px 14px rgba(11, 30, 63, 0.22))
+      drop-shadow(0 0 24px rgba(88, 196, 255, 0.5))
+      drop-shadow(0 0 8px rgba(255, 255, 255, 0.35));
+  }
+  50% {
+    /* Float up, tilt a touch more, and bloom the glow brighter so the badge
+       feels like it's catching light mid-hover. Scale tweak is sub-perceptual
+       but reinforces the lift. */
+    transform: rotate(-6.5deg) translateY(-10px) scale(1.015);
+    filter:
+      drop-shadow(0 34px 56px rgba(11, 30, 63, 0.34))
+      drop-shadow(0 10px 22px rgba(11, 30, 63, 0.2))
+      drop-shadow(0 0 38px rgba(88, 196, 255, 0.75))
+      drop-shadow(0 0 14px rgba(255, 255, 255, 0.5));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__badge {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   SOCIAL ICONS
+   ========================================================================== */
+.social-icons {
+  display: flex;
+  gap: 16px;
+  list-style: none;
+}
+
+.social-icons__link {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-circle);
+  background: var(--white);
+  color: var(--navy);
+  box-shadow: var(--shadow-btn);
+  transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.social-icons__link:hover {
+  transform: translateY(-3px);
+  background: var(--navy);
+  color: var(--white);
+}
+
+/* Mask-based social icon: the downloaded simple-icons SVGs are plain black
+   silhouettes, so we render them via CSS mask and tint with currentColor.
+   currentColor inherits from the anchor's color (navy normal, white on hover),
+   so the existing hover rule works unchanged. */
+.social-icons__icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+  background: currentColor;
+  -webkit-mask: var(--icon-url) center / contain no-repeat;
+          mask: var(--icon-url) center / contain no-repeat;
+}
+
+/* ==========================================================================
+   TOOLS MARQUEE
+   ==========================================================================
+   Contained white bar under the hero. Horizontal margin keeps the bar off
+   the viewport edges so it reads as a floating element instead of a full
+   edge-to-edge band. Subtle rounded corners + hairline border + soft shadow
+   give it a floating card feel. */
+.tools-marquee {
+  position: relative;
+  margin: 0 clamp(24px, 6vw, 96px);
+  padding: 0;
+  overflow: hidden;
+  background: var(--white);
+  border-radius: 18px;
+  border: 1px solid rgba(11, 30, 63, 0.06);
+  box-shadow:
+    0 30px 70px -40px rgba(11, 30, 63, 0.22),
+    0 4px 20px -10px rgba(11, 30, 63, 0.08);
+}
+
+.tools-marquee__track {
+  display: flex;
+  align-items: center;
+  gap: 72px;
+  width: max-content;
+  padding: 28px 40px;
+  /* Seamless loop: list is doubled in JSX, -50% lands on the seam. */
+  animation: marquee 80s linear infinite;
+  will-change: transform;
+}
+.tools-marquee:hover .tools-marquee__track {
+  /* Pause-on-hover lets visitors actually read the list without dark-patterning
+     them into a moving target. Standard portfolio affordance. */
+  animation-play-state: paused;
+}
+
+.tools-marquee__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+  position: relative;
+  padding-right: 72px;
+  color: var(--navy);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+}
+.tools-marquee__item::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 22px;
+  background: rgba(11, 30, 63, 0.1);
+}
+.tools-marquee__item:last-child::after {
+  display: none;
+}
+
+.tools-marquee__icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  /* Single-color simple-icons SVGs tinted via --brand-color + mask. The SVG
+     file acts as the silhouette; background-color does the tint. */
+  background: var(--brand-color, var(--navy));
+  -webkit-mask: var(--icon-url) center / contain no-repeat;
+          mask: var(--icon-url) center / contain no-repeat;
+}
+
+.tools-marquee__img {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  object-fit: contain;
+  /* Multi-color brand PNGs render as-is with their native colors preserved. */
+}
+
+.tools-marquee__label {
+  color: var(--navy);
+}
+
+@keyframes marquee {
+  0%   { transform: translate(0); }
+  100% { transform: translate(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tools-marquee__track {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   ABOUT
+   ==========================================================================
+   Section sits on the WebGL shader's dark navy fade via `.dark-section`. No
+   background rule here - HeroCanvas handles the color blend based on which
+   dark sections are in view. NavBar.tsx flips link color to white when this
+   region intersects the top of the viewport.
+
+   me.png has native alpha (no baked-in background) so the illustration renders
+   directly over the shader navy. A soft orange radial glow sits behind the
+   figure to ground it and tie back to the brand accent.
+
+   Top padding accounts for the floating nav pill (~96px zone) so the headline
+   never collides with the pill when the section scrolls into view.
+
+   Card row keeps its asymmetric 3-column grid (card 1 spans both rows on the
+   left, cards 2+3 top right, card 4 bottom right). White cards lift cleanly
+   off the navy background and keep their navy interior text.
+   ========================================================================== */
+.about {
+  /* Top padding tightened so About sits closer to the ToolsMarquee
+     band above it instead of leaving a big empty navy gap. */
+  padding: clamp(64px, 9vh, 120px) clamp(32px, 10vw, 160px) clamp(100px, 14vh, 180px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(64px, 9vh, 120px);
+  color: var(--white);
+}
+
+.about__top {
+  display: grid;
+  /* Slight asymmetry favoring the portrait column so the figure feels
+     present at desktop+ widths (1300px+) without crowding the headline. */
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(48px, 6vw, 120px);
+  /* Stretch lets the left column fill the row height (portrait height)
+     so the stats grid can push to the bottom and align with the
+     nameplate. */
+  align-items: stretch;
+}
+
+/* Free-floating portrait wrapper. No navy card, no border, no mix-blend-mode.
+   me.png has alpha so it renders directly over the dark-section shader. A soft
+   orange radial glow behind the figure adds brand warmth and helps the
+   silhouette read as intentional, not pasted. Larger ceiling so the portrait
+   can grow on wide viewports instead of looking small in a wide right column. */
+.about__portrait {
+  position: relative;
+  /* Cap portrait width so the right-column height stays in the same
+     range as the left-column intro stack. A taller portrait creates
+     a giant empty gap between the body copy and the stats grid. */
+  width: min(560px, 100%);
+  /* Wider 5:6 aspect (was 4:5) so the cropped container is also less
+     tall - keeps the columns balanced without losing too much of the
+     figure. */
+  aspect-ratio: 5 / 6;
+  justify-self: start;
+  isolation: isolate;
+}
+.about__portrait::before {
+  content: '';
+  position: absolute;
+  inset: -12% -8% -4% -8%;
+  background: radial-gradient(
+    ellipse at 40% 60%,
+    rgba(255, 122, 26, 0.28),
+    transparent 62%
+  );
+  filter: blur(56px);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.about__portrait-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* Cover the cropped 4:5 container with the figure anchored at the top
+     so the bottom transparent strip of the source image is what gets
+     trimmed (not the subject's head). */
+  object-fit: cover;
+  object-position: top center;
+  /* Drop-shadow tuned against the shader navy so the figure feels seated on
+     the dark surface instead of floating loose. */
+  filter: drop-shadow(0 40px 60px rgba(6, 12, 26, 0.55));
+}
+
+.about__intro {
+  max-width: 48ch;
+  padding-bottom: 0;
+}
+
+.about__eyebrow {
+  display: block;
+  font-size: var(--fs-eyebrow);
+  font-weight: 500;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 20px;
+}
+
+.about__headline {
+  font-family: var(--font-display);
+  /* Big and unambiguous - this is the section's load-bearing line, and the
+     giant display word is gone so this needs to carry visual weight on its
+     own. One clamp tier quieter than the hero display name. */
+  font-size: clamp(48px, 6vw, 88px);
+  font-weight: 700;
+  line-height: 1.02;
+  color: var(--white);
+  margin: 0 0 32px;
+  letter-spacing: -0.025em;
+}
+
+.about__body {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.7;
+  margin: 0;
+  max-width: 58ch;
+  font-weight: 400;
+}
+
+.about__intro {
+  max-width: 60ch;
+  /* Flex column. margin-top:auto on the eyebrow consumes the empty
+     space above it, pushing the entire stack (eyebrow → headline →
+     body → stats) tight against the bottom of the column so it sits
+     close to the stats / nameplate baseline. */
+  display: flex;
+  flex-direction: column;
+}
+.about__eyebrow {
+  margin-top: auto;
+}
+
+/* Pillars - numbered editorial rows, not a card grid. Same anatomy as a
+   Benefits card (number / icon tile / lead / support / chip) flattened to
+   a hairline-divided list so About does not clone the Benefits deck:
+   differentiation within the language, not a second copy of it. */
+/* Four capability pillars as a 2x2 bento of contained cards. The full-width
+   row layout left dead space + let the shader bleed through; cards fill their
+   width, dock the chip in a footer, and occlude the contour cleanly. */
+.about__pillars {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(16px, 2.2vw, 28px);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.about__pillar {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(22px, 2.4vw, 30px);
+  /* translucent frosting occludes the contour lines behind the text */
+  background: color-mix(in srgb, var(--white) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--white) 10%, transparent);
+  border-radius: var(--radius-card);
+  /* scroll reveal: rise + fade, staggered card-to-card */
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 620ms var(--ease-out),
+    transform 560ms var(--ease-spring),
+    border-color var(--dur-med) var(--ease-out);
+}
+.about.is-revealed .about__pillar { opacity: 1; transform: none; }
+.about.is-revealed .about__pillar:nth-child(1) { transition-delay: 80ms; }
+.about.is-revealed .about__pillar:nth-child(2) { transition-delay: 150ms; }
+.about.is-revealed .about__pillar:nth-child(3) { transition-delay: 220ms; }
+.about.is-revealed .about__pillar:nth-child(4) { transition-delay: 290ms; }
+
+@media (hover: hover) and (pointer: fine) {
+  .about__pillar:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--white) 18%, transparent);
+  }
+  .about__pillar:hover .about__pillar-num { color: var(--orange); }
+  .about__pillar:hover .about__pillar-icon {
+    background: color-mix(in srgb, var(--orange) 12%, transparent);
+  }
+}
+
+/* head row: logo tile (or AI logo strip) on the left, ordinal on the right */
+.about__pillar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.about__pillar-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--white) 6%, transparent);
+  transition: background var(--dur-med) var(--ease-out);
+}
+
+/* harness card: a row of monochrome AI-tool logos tinted to cream via CSS mask
+   (same recipe as the tools marquee, so currentColor SVGs read on dark) */
+.about__pillar-stack {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+.about__pillar-ai {
+  width: 23px;
+  height: 23px;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--cream) 82%, transparent);
+  -webkit-mask: var(--ai-mask) center / contain no-repeat;
+          mask: var(--ai-mask) center / contain no-repeat;
+  transition: background var(--dur-med) var(--ease-out);
+}
+.about__pillar--harness:hover .about__pillar-ai { background: var(--cream); }
+
+.about__pillar-num {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  transition: color var(--dur-med) var(--ease-out);
+}
+
+.about__pillar-title {
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--white);
+  margin: 0;
+}
+
+.about__pillar-body {
+  font-size: 15px;
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--cream) 70%, transparent);
+  margin: 12px 0 0;
+}
+
+/* footer: hairline + quiet metric chip, pinned to the card bottom so chips
+   line up across cards of different body lengths. Chip stays muted (not
+   orange) so it does not compete with the orange stat cards in the intro. */
+.about__pillar-foot {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid color-mix(in srgb, var(--white) 8%, transparent);
+}
+.about__pillar-chip {
+  display: inline-block;
+  padding: 6px 13px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: color-mix(in srgb, var(--cream) 80%, transparent);
+  background: color-mix(in srgb, var(--white) 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--white) 12%, transparent);
+  border-radius: var(--radius-pill);
+}
+
+@media (max-width: 900px) {
+  .about__pillars { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ==========================================================================
+   FUNNELS
+   ==========================================================================
+   Sample-work section showcasing GoHighLevel funnel pages. Sits on the WebGL
+   shader's dark navy fade via `.dark-section` (same pattern as About and
+   ContactStrip - no background rule here).
+
+   Layout on desktop (>=1024px):
+     header (eyebrow + h2 + subhead)
+     tab row (Gym / Book-a-Call pills)
+     2-column panel: 640px iframe preview on the left, details on the right
+     horizontal thumbnail strip below
+
+   The iframe trick:
+     Each funnel HTML was built for a ~1280px viewport. To render it in a
+     640x400 preview window without a tiny unreadable iframe or a scrollbar,
+     the iframe is set to 1280x2200 and `transform: scale(0.5)` is applied
+     from the top-left. The wrapping div is 640x400 with overflow:hidden, so
+     the visible region is a perfectly-proportioned 2:1 scaled-down snapshot.
+     Pointer events pass through to the wrapping button so the whole preview
+     is clickable (opens full page in a new tab).
+
+   Tag colors flow in via `--tag-color` inline custom property - they are
+   brand-external identifiers for funnel stage types, not site palette tokens.
+   Same pattern as the tools-marquee `--brand-color`.
+   ========================================================================== */
+.funnels {
+  padding: var(--section-pad-y) clamp(32px, 10vw, 160px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(40px, 5vh, 64px);
+  color: var(--white);
+}
+
+.funnels__header {
+  max-width: 64ch;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.funnels__eyebrow {
+  display: block;
+  font-size: var(--fs-eyebrow);
+  font-weight: 500;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--orange-ink);
+}
+
+.funnels__headline {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 5vw, 72px);
+  font-weight: 700;
+  line-height: 1.04;
+  color: var(--white);
+  margin: 0;
+  letter-spacing: -0.025em;
+}
+
+.funnels__subhead {
+  font-size: 17px;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 56ch;
+}
+
+/* Tab row - navy pill container with a white active indicator, matches the
+   navbar's scrolled-pill aesthetic so this section stays in the same visual
+   language. */
+.funnels__tabs {
+  display: inline-flex;
+  align-self: flex-start;
+  gap: 6px;
+  padding: 6px;
+  background: rgba(6, 12, 26, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-pill);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.funnels__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 22px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 14.5px;
+  font-weight: 500;
+  font-family: inherit;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition:
+    background var(--dur-med) var(--ease-out),
+    color var(--dur-med) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.funnels__tab:hover:not(.is-active) {
+  color: var(--white);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.funnels__tab.is-active {
+  background: var(--orange);
+  color: var(--white);
+  box-shadow: 0 8px 24px -12px rgba(255, 122, 26, 0.7);
+}
+
+.funnels__tab-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-pill);
+}
+
+.funnels__tab.is-active .funnels__tab-count {
+  background: rgba(255, 255, 255, 0.22);
+  color: var(--white);
+}
+
+/* Panel - preview on the left, details on the right. */
+.funnels__panel {
+  display: grid;
+  grid-template-columns: minmax(0, 640px) minmax(0, 1fr);
+  gap: clamp(32px, 4vw, 64px);
+  align-items: stretch;
+}
+
+/* Preview is a button so the whole frame is clickable and keyboard
+   reachable - opens the active funnel in a new tab. */
+.funnels__preview {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-card);
+  background: rgba(6, 12, 26, 0.55);
+  box-shadow:
+    0 40px 90px -30px rgba(0, 0, 0, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(6, 12, 26, 0.4);
+  cursor: pointer;
+  overflow: hidden;
+  font: inherit;
+  color: inherit;
+  transition:
+    transform var(--dur-med) var(--ease-out),
+    box-shadow var(--dur-med) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.funnels__preview:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 122, 26, 0.45);
+  box-shadow:
+    0 54px 110px -32px rgba(0, 0, 0, 0.85),
+    0 0 0 1px rgba(255, 122, 26, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(6, 12, 26, 0.5);
+}
+
+/* Wrapper for the scaled iframe. Fixed aspect (16:10) by using padding-top,
+   with an absolutely-positioned iframe inside so the scale transform has a
+   stable parent box. */
+.funnels__preview-frame {
+  position: relative;
+  width: 100%;
+  padding-top: 62.5%; /* 16:10 aspect, matches 640x400 */
+  overflow: hidden;
+  /* White surface so pages with light backgrounds render correctly and
+     bright content stays visible - previously a navy frame made every
+     preview look like a dim void. */
+  background: var(--white);
+  pointer-events: none;
+}
+
+.funnels__iframe {
+  /* The preview pane element is now a static thumbnail <img>, not a live
+     iframe. Using cover so the thumbnail (1280x720 jpeg) fills the 16:10
+     preview frame top-aligned. Live iframe still mounts in the modal on
+     click - this kills the mid-page scroll repaint cost. */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  object-fit: cover;
+  object-position: top center;
+  pointer-events: none;
+  background: var(--white);
+  display: block;
+}
+
+/* Hover overlay pill floats over the preview and surfaces the "Open full page"
+   affordance. Hidden by default, fades in when the preview is hovered or
+   focused. */
+.funnels__preview-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 55%,
+    rgba(6, 12, 26, 0.45) 100%
+  );
+  transition: opacity var(--dur-med) var(--ease-out);
+}
+
+.funnels__preview:hover .funnels__preview-overlay,
+.funnels__preview:focus-visible .funnels__preview-overlay {
+  opacity: 1;
+}
+
+.funnels__preview-overlay-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--white);
+  color: var(--navy);
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: var(--shadow-btn);
+}
+
+/* Details column - title, tag, desc, CTA. */
+.funnels__details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+  padding: 8px 0;
+}
+
+.funnels__tag {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--tag-color, var(--orange));
+  background: color-mix(in srgb, var(--tag-color, var(--orange)) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--tag-color, var(--orange)) 45%, transparent);
+  border-radius: var(--radius-pill);
+}
+
+.funnels__detail-title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--white);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.funnels__detail-body {
+  font-size: 16px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.72);
+  margin: 0;
+  max-width: 52ch;
+}
+
+/* Premium primary CTA - dark navy fill, orange icon accent.
+   Used here and on Contact + Sample Plan for a unified conversion
+   button system. Inset top highlight + soft drop shadow for depth.
+   Hover lifts the button and adds a subtle orange ring. */
+.funnels__cta {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 10px;
+  padding: 14px 24px;
+  margin-top: 8px;
+  background: var(--navy-ink);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 1px 0 rgba(11, 30, 63, 0.04),
+    0 12px 28px -16px rgba(11, 30, 63, 0.5);
+  transition:
+    background 240ms var(--ease-out),
+    transform 240ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 240ms var(--ease-out),
+    gap 240ms var(--ease-out);
+}
+.funnels__cta svg {
+  color: var(--orange);
+  transition: transform 240ms var(--ease-out);
+}
+.funnels__cta:hover {
+  background: var(--navy);
+  transform: translateY(-2px);
+  gap: 14px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 1px 0 rgba(11, 30, 63, 0.04),
+    0 18px 36px -16px rgba(11, 30, 63, 0.55),
+    0 0 0 1px rgba(255, 122, 26, 0.25);
+}
+.funnels__cta:hover svg { transform: translate(2px, -2px); }
+.funnels__cta:active { transform: translateY(0); }
+.funnels__cta:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 3px;
+}
+
+/* Funnel flow - compact pill row nested inside the details column directly
+   under the CTA. Small type, tight gaps, wraps gracefully if the column is
+   narrow. Only rendered for the gym tab. */
+.funnels__flow {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.funnels__flow-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.funnels__flow-stages {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+
+.funnels__flow-stage {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.funnels__flow-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--tag-color, var(--orange)) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--tag-color, var(--orange)) 35%, transparent);
+  color: color-mix(in srgb, var(--tag-color, var(--orange)) 90%, var(--white));
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.funnels__flow-stage.is-active .funnels__flow-pill {
+  background: color-mix(in srgb, var(--tag-color, var(--orange)) 22%, transparent);
+  border-color: var(--tag-color, var(--orange));
+  color: var(--white);
+  box-shadow:
+    0 0 0 1px var(--tag-color, var(--orange)),
+    0 0 16px -4px color-mix(in srgb, var(--tag-color, var(--orange)) 70%, transparent);
+}
+
+.funnels__flow-arrow {
+  display: inline-flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.22);
+  width: 12px;
+  height: 12px;
+}
+.funnels__flow-arrow svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Thumbs header - small label + count above the strip. Nested inside the
+   details column below the funnel flow. */
+.funnels__thumbs-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.funnels__thumbs-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.funnels__thumbs-count {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* Thumbnail strip - horizontal flex below the preview panel. Each thumb is a
+   button; active gets a colored border + glow driven by --tag-color. */
+.funnels__thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.funnels__thumb-item {
+  flex: 0 0 auto;
+}
+
+.funnels__thumb {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 200px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.funnels__thumb-img-wrap {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: var(--navy-ink);
+  box-shadow: 0 16px 40px -24px rgba(0, 0, 0, 0.7);
+  transition:
+    transform var(--dur-med) var(--ease-out),
+    border-color var(--dur-med) var(--ease-out),
+    box-shadow var(--dur-med) var(--ease-out);
+}
+
+.funnels__thumb:hover .funnels__thumb-img-wrap {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.funnels__thumb.is-active .funnels__thumb-img-wrap {
+  border-color: var(--tag-color, var(--orange));
+  box-shadow:
+    0 20px 44px -20px rgba(0, 0, 0, 0.8),
+    0 0 0 1px var(--tag-color, var(--orange)),
+    0 0 24px -4px color-mix(in srgb, var(--tag-color, var(--orange)) 60%, transparent);
+}
+
+.funnels__thumb-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.funnels__thumb-label {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0 2px;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.funnels__thumb:hover .funnels__thumb-label {
+  color: var(--white);
+}
+
+.funnels__thumb.is-active .funnels__thumb-label {
+  color: var(--white);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   FUNNELS MODAL - in-page iframe preview with browser-chrome shell
+   ==========================================================================
+   Opens over the portfolio when a funnel is clicked. Visitor stays on the
+   page, sees the funnel inside a Safari-style window chrome with traffic
+   lights, URL bar, and close button. Escape key or clicking the backdrop
+   also dismisses. */
+.funnels__modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 0;
+  background: rgba(6, 12, 26, 0.92);
+  animation: funnels-modal-fade 220ms var(--ease-out);
+}
+
+@keyframes funnels-modal-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.funnels__modal-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: none;
+  animation: funnels-modal-pop 280ms var(--ease-out);
+}
+
+@keyframes funnels-modal-pop {
+  from { transform: translateY(12px) scale(0.985); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* Browser-chrome bar with traffic lights on the left and close on the right. */
+.funnels__modal-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  background: linear-gradient(180deg, #f4f4ed 0%, #e8e8df 100%);
+  border-bottom: 1px solid rgba(11, 30, 63, 0.12);
+  flex-shrink: 0;
+}
+
+.funnels__modal-lights {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.funnels__modal-light {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+.funnels__modal-light--red   { background: #ff5f57; }
+.funnels__modal-light--amber { background: #febc2e; }
+.funnels__modal-light--green { background: #28c840; }
+
+.funnels__modal-url {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 16px;
+  background: var(--white);
+  border: 1px solid rgba(11, 30, 63, 0.12);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-size: 13px;
+  color: var(--navy);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.funnels__modal-url-scheme {
+  color: var(--muted);
+}
+.funnels__modal-url-path {
+  color: var(--navy);
+  font-weight: 500;
+}
+
+.funnels__modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.funnels__modal-external,
+.funnels__modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out),
+              color var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out);
+}
+.funnels__modal-external:hover,
+.funnels__modal-close:hover {
+  background: rgba(11, 30, 63, 0.08);
+  color: var(--navy);
+  border-color: rgba(11, 30, 63, 0.12);
+}
+
+.funnels__modal-iframe {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: var(--white);
+  display: block;
+}
+
+@media (max-width: 720px) {
+  .funnels__modal-url {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+  .funnels__modal-url-scheme {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   CONTACT STRIP
+   ========================================================================== */
+.contact-strip {
+  /* Full-viewport minimum so the WebGL shader reaches 100% darkMix when this
+     section fills the viewport. No solid background - the shader's own navy
+     dark-state (#060C1A) blends in through the .dark-section class, so the
+     section appears as a smooth navy fade instead of a hard rectangle.
+
+     Centered single column: the finale breaks the headline-left rhythm
+     and makes the email the largest interactive element on the page. */
+  min-height: 100dvh;
+  padding: clamp(140px, 16vh, 220px) var(--container-x);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--white);
+}
+
+.contact-strip__headline {
+  font-size: var(--fs-h2);
+  font-weight: 600;
+  line-height: var(--lh-heading);
+  color: var(--white);
+  max-width: 18ch;
+}
+
+.contact-strip__eyebrow {
+  display: block;
+  font-size: var(--fs-eyebrow);
+  font-weight: 500;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 24px;
+}
+
+/* Display-scale bare email link - no pill. The orange underline carries
+   the accent; the type size carries the invitation. */
+.contact-strip__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 48px;
+  padding-bottom: 6px;
+  font-family: var(--font-display);
+  font-size: clamp(24px, 2.6vw, 36px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--white);
+  border-bottom: 2px solid var(--orange);
+  text-decoration: none;
+  transition: color 240ms var(--ease-out);
+}
+.contact-strip__cta svg {
+  color: var(--orange);
+  flex-shrink: 0;
+  transition: transform 240ms var(--ease-out);
+}
+.contact-strip__cta:hover {
+  color: var(--orange);
+}
+.contact-strip__cta:hover svg { transform: translate(2px, -2px); }
+.contact-strip__cta:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 4px;
+}
+
+.contact-strip__quote {
+  margin-top: 40px;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.72);
+  max-width: 38ch;
+}
+
+/* ==========================================================================
+   PAIN POINTS
+   Dark section. Three cards with AI-generated images showing the problems
+   the site owner solves - cracked funnel, missed follow-ups, manual repetitive work.
+   ========================================================================== */
+.pain {
+  padding: clamp(120px, 14vh, 180px) clamp(32px, 10vw, 160px) clamp(100px, 14vh, 180px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(48px, 6vh, 80px);
+  color: var(--white);
+}
+
+.pain__header {
+  max-width: 64ch;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pain__eyebrow {
+  display: block;
+  font-size: var(--fs-eyebrow);
+  font-weight: 500;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--orange);
+}
+
+.pain__headline {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 5vw, 72px);
+  font-weight: 700;
+  line-height: 1.04;
+  color: var(--white);
+  margin: 0;
+  letter-spacing: -0.025em;
+}
+
+.pain__subhead {
+  font-size: 17px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 56ch;
+}
+
+.pain__cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  /* 3 row tracks: image | headline | body text.
+     Subgrid locks all cards to these shared tracks so the headline and
+     body copy align horizontally even when headlines wrap to different
+     numbers of lines. */
+  grid-template-rows: auto auto 1fr;
+  column-gap: 24px;
+  row-gap: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pain__card {
+  grid-row: 1 / -1;
+  display: grid;
+  grid-template-rows: subgrid;
+  align-items: start;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(6, 12, 26, 0.5);
+  box-shadow:
+    0 30px 60px -24px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(6, 12, 26, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition:
+    transform var(--dur-med) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-med) var(--ease-out);
+}
+
+.pain__card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255, 122, 26, 0.35);
+  box-shadow:
+    0 44px 90px -28px rgba(0, 0, 0, 0.85),
+    0 0 0 1px rgba(255, 122, 26, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(6, 12, 26, 0.5);
+}
+
+.pain__card-img-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.pain__card-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+}
+
+/* Gradient overlay blends the image into the card body below it. */
+.pain__card-img-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 40%,
+    rgba(6, 12, 26, 0.88) 100%
+  );
+  pointer-events: none;
+}
+
+.pain__card-headline {
+  font-family: var(--font-display);
+  font-size: clamp(18px, 1.6vw, 22px);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--white);
+  margin: 0;
+  letter-spacing: -0.01em;
+  padding: 28px 28px 0;
+}
+
+.pain__card-text {
+  font-size: 14.5px;
+  line-height: 1.68;
+  color: rgba(255, 255, 255, 0.62);
+  margin: 0;
+  padding: 14px 28px 36px;
+}
+
+/* ==========================================================================
+   SERVICES
+   Dark section. 5-column grid of service cards with Phosphor icons,
+   title, one-liner description, and bullet list.
+   ========================================================================== */
+.services {
+  padding: clamp(100px, 12vh, 160px) clamp(32px, 10vw, 160px) clamp(100px, 14vh, 180px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(48px, 6vh, 72px);
+  color: var(--white);
+}
+
+.services__header {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: center;
+  align-items: center;
+}
+
+.services__eyebrow {
+  display: block;
+  font-size: var(--fs-eyebrow);
+  font-weight: 500;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--orange-ink);
+}
+
+.services__headline {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 4.5vw, 64px);
+  font-weight: 700;
+  line-height: 1.06;
+  color: var(--white);
+  margin: 0;
+  letter-spacing: -0.025em;
+}
+
+.services__subhead {
+  font-size: 17px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.services__grid {
+  display: grid;
+  /* Top row: 3 cards. Bottom row: 2 cards centered (cards 4+5 each
+     span 3 columns of a 6-col base grid, offset by their start lines). */
+  grid-template-columns: repeat(6, 1fr);
+  column-gap: 18px;
+  row-gap: 18px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+/* First three cards: 2 cols each on the 6-col grid (3 cards x 2 = 6) */
+.service-card:nth-child(1) { grid-column: 1 / span 2; }
+.service-card:nth-child(2) { grid-column: 3 / span 2; }
+.service-card:nth-child(3) { grid-column: 5 / span 2; }
+/* Bottom row 4+5: 2 cards x 2 cols each, offset by 1 to center */
+.service-card:nth-child(4) { grid-column: 2 / span 2; }
+.service-card:nth-child(5) { grid-column: 4 / span 2; }
+
+.service-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px 22px 24px;
+  border-radius: var(--radius-card);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(6, 12, 26, 0.5);
+  box-shadow:
+    0 20px 50px -24px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(6, 12, 26, 0.4);
+  transition:
+    transform var(--dur-med) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-med) var(--ease-out);
+}
+
+.service-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 122, 26, 0.4);
+  box-shadow:
+    0 36px 80px -28px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(255, 122, 26, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(6, 12, 26, 0.5);
+}
+
+/* Head row: icon tile inline with the title. */
+.service-card__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.service-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: rgba(255, 122, 26, 0.12);
+  border: 1px solid rgba(255, 122, 26, 0.25);
+  color: var(--orange);
+}
+
+.service-card__title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--white);
+  margin: 0;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.service-card__desc {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0;
+  line-height: 1.5;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.service-card__bullets {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.service-card__bullet {
+  position: relative;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.65);
+  padding-left: 14px;
+}
+
+.service-card__bullet::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--orange);
+  opacity: 0.7;
+}
+
+/* ==========================================================================
+   PROJECTS
+   Light-mode section - no dark-section class. The shader transitions back
+   to cream as the viewport clears the Funnels dark zone. Cards are white
+   with subtle navy borders and per-app accent colors via --app-color.
+   ========================================================================== */
+.projects {
+  padding: var(--section-pad-y) clamp(32px, 10vw, 160px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(40px, 5vh, 64px);
+  color: var(--navy);
+}
+
+.projects__header {
+  max-width: 64ch;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.projects__eyebrow {
+  display: block;
+  font-size: var(--fs-eyebrow);
+  font-weight: 500;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--orange-ink);
+}
+
+.projects__headline {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 5vw, 72px);
+  font-weight: 700;
+  line-height: 1.04;
+  color: var(--navy);
+  margin: 0;
+  letter-spacing: -0.025em;
+}
+
+.projects__subhead {
+  font-size: 17px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 56ch;
+}
+
+/* Tab row - light version of the .funnels__tabs pill container */
+.projects__tabs {
+  display: inline-flex;
+  align-self: flex-start;
+  gap: 6px;
+  padding: 6px;
+  background: var(--white);
+  border: 1px solid rgba(11, 30, 63, 0.1);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 4px 16px -8px rgba(11, 30, 63, 0.12);
+}
+
+.projects__tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 28px;
+  /* min-width keeps the tab container visually weighty when there are
+     only 2 tabs - matches the rhythm we had when Tools was the third. */
+  min-width: 180px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 14.5px;
+  font-weight: 500;
+  font-family: inherit;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition:
+    background var(--dur-med) var(--ease-out),
+    color var(--dur-med) var(--ease-out);
+}
+
+.projects__tab:hover:not(.is-active) {
+  color: var(--navy);
+  background: rgba(11, 30, 63, 0.05);
+}
+
+.projects__tab.is-active {
+  background: var(--orange);
+  color: var(--white);
+  box-shadow: 0 8px 24px -12px rgba(255, 122, 26, 0.7);
+}
+
+.projects__tab-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  background: rgba(11, 30, 63, 0.07);
+  border-radius: var(--radius-pill);
+}
+
+.projects__tab.is-active .projects__tab-count {
+  background: rgba(255, 255, 255, 0.22);
+  color: var(--white);
+}
+
+/* Tool grid - compact 4-column layout for the Tools tab */
+.projects__tools {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tool-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 20px;
+  background: var(--white);
+  border: 1px solid rgba(11, 30, 63, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px -8px rgba(11, 30, 63, 0.1);
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
+}
+
+.tool-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 122, 26, 0.35);
+  box-shadow: 0 12px 28px -10px rgba(11, 30, 63, 0.16);
+}
+
+.tool-card__icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(255, 122, 26, 0.1);
+  color: var(--orange);
+}
+
+.tool-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.tool-card__name {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--navy);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.tool-card__desc {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* Three-column grid. Each card is visually distinct via --app-color. */
+.projects__apps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  align-items: start;
+}
+
+/* Empty state for unpopulated tabs */
+.projects__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 80px 0;
+  text-align: center;
+}
+
+.projects__empty-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(11, 30, 63, 0.3);
+}
+
+.projects__empty-body {
+  font-size: 16px;
+  color: var(--muted);
+  max-width: 36ch;
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   BROWSER EXTENSIONS - compact two-up companion block inside Projects.
+   Not a new section: sits under the app grid, above the Flagship callout.
+   ========================================================================== */
+.projects__ext {
+  margin-top: clamp(36px, 5vw, 60px);
+}
+.projects__ext-eyebrow {
+  display: block;
+  margin-bottom: 20px;
+  font-size: var(--fs-eyebrow);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.ext-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(20px, 2.4vw, 32px);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+/* Vertical card: browser window on top, content beneath. */
+.ext-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+  transition:
+    transform 320ms var(--ease-out),
+    box-shadow 320ms var(--ease-out),
+    border-color 320ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .ext-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 122, 26, 0.3);
+    box-shadow: var(--shadow-card);
+  }
+}
+
+/* Faux browser window framing the screenshot. */
+.ext-card__window {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--divider);
+}
+/* Chrome bar: traffic-light dots + a faux address pill. */
+.ext-card__chrome {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #f2f1ea;
+  border-bottom: 1px solid var(--divider);
+}
+.ext-card__dots {
+  display: inline-flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.ext-card__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(11, 30, 63, 0.16);
+}
+.ext-card__urlbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--white);
+  border: 1px solid var(--divider);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ext-card__urlbar svg {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+/* The page viewport - equal height on both cards so the portrait and
+   landscape screenshots line up as a matched set. Dotted neutral wash
+   reads as an empty canvas behind the popup. */
+.ext-card__stage {
+  display: grid;
+  place-items: center;
+  height: clamp(300px, 30vw, 360px);
+  padding: clamp(18px, 2.4vw, 28px);
+  background-color: #faf7ef;
+  background-image: radial-gradient(circle, rgba(11, 30, 63, 0.08) 1.1px, transparent 1.4px);
+  background-size: 16px 16px;
+  overflow: hidden;
+}
+/* contain keeps each image's own aspect ratio; the native-width ceiling
+   stops either screenshot from being upscaled past its source resolution,
+   so both stay crisp (ghl-key 419w portrait, yt2text 403w landscape). */
+.ext-card__img {
+  max-width: min(100%, 380px);
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 18px 40px -18px rgba(11, 30, 63, 0.45);
+}
+
+.ext-card__body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: clamp(20px, 2.2vw, 28px);
+}
+.ext-card__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 122, 26, 0.1);
+  color: var(--orange-ink);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.ext-card__name {
+  margin: 2px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(18px, 1.9vw, 22px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--navy);
+}
+.ext-card__desc {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+/* Collapse to a single column on the shared mobile breakpoint. The stage
+   shortens a touch so a single card does not eat a whole phone screen. */
+@media (max-width: 900px) {
+  .ext-grid { grid-template-columns: minmax(0, 1fr); }
+  .ext-card__stage { height: clamp(260px, 64vw, 340px); }
+}
+
+/* ==========================================================================
+   APP CARD
+   Individual card within .projects__apps. White surface, soft navy border.
+   --app-color drives badge, stats, tagline, and CTA without hardcoding.
+   ========================================================================== */
+.app-card {
+  display: flex;
+  flex-direction: column;
+  /* Equal card heights regardless of body length so the row aligns
+     cleanly across screen sizes. The .app-card__body grows with flex:1
+     and pushes the stats row to the bottom. */
+  height: 100%;
+  min-height: 540px;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  border: 1px solid rgba(11, 30, 63, 0.08);
+  background: var(--white);
+  box-shadow:
+    0 20px 60px -24px rgba(11, 30, 63, 0.16),
+    0 4px 20px -8px rgba(11, 30, 63, 0.07);
+  transition:
+    transform 0.5s var(--ease-spring),
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-med) var(--ease-out);
+}
+
+.app-card:hover {
+  transform: translateY(-8px);
+  border-color: color-mix(in srgb, var(--app-color) 40%, transparent);
+  box-shadow:
+    0 44px 90px -28px rgba(11, 30, 63, 0.22),
+    0 0 0 1px color-mix(in srgb, var(--app-color) 22%, transparent),
+    0 4px 20px -8px rgba(11, 30, 63, 0.08);
+}
+
+/* Screenshot / marketing image area.
+   Taller aspect (4:3) so vertical phone shots get full breathing room.
+   Accent-tinted radial wash behind the image so contained images
+   float on a designed surface instead of looking orphaned. */
+.app-card__img-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  flex-shrink: 0;
+  /* Hover lift lives on the wrap, not the img - the scroll parallax in
+     useScrollFX owns the img's inline transform on desktop, and an
+     inline style would override any CSS hover on the img itself. */
+  transition: transform 0.5s var(--ease-spring);
+  background:
+    radial-gradient(
+      ellipse at 50% 30%,
+      color-mix(in srgb, var(--app-color) 16%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--app-color) 8%, #FAFAF7),
+      color-mix(in srgb, var(--app-color) 4%, #F4F4ED)
+    );
+  padding: 14px;
+}
+
+.app-card__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* contain so the WHOLE image is visible no matter the source aspect.
+     No more cropped Play Store screenshots or status bars showing. */
+  object-fit: contain;
+  object-position: center;
+  pointer-events: none;
+  filter: drop-shadow(0 12px 24px rgba(11, 30, 63, 0.16));
+  transition: transform 360ms var(--ease-out);
+}
+.app-card:hover .app-card__img-wrap {
+  transform: translateY(-4px) scale(1.02);
+}
+
+/* Subtle bottom fade easing the image area into the card body. */
+.app-card__img-fade {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 32%;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in srgb, var(--app-color) 6%, rgba(255, 255, 255, 0.85)) 100%
+  );
+  pointer-events: none;
+}
+
+/* Placeholder shown when no imageSrc is provided. Radial accent bloom
+   plus the app's initials in display type - feels intentional, not
+   "missing image". */
+.app-card__img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(
+      ellipse at 50% 40%,
+      color-mix(in srgb, var(--app-color) 28%, transparent),
+      transparent 65%
+    );
+  border-radius: 12px;
+}
+.app-card__img-initials {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 5vw, 76px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: color-mix(in srgb, var(--app-color) 90%, var(--navy));
+  opacity: 0.45;
+  line-height: 1;
+}
+
+/* Status badge - top-right corner of the image */
+.app-card__badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  padding: 4px 11px;
+  border-radius: var(--radius-pill);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--white);
+  background: color-mix(in srgb, var(--app-color) 92%, var(--navy));
+  box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--app-color) 70%, transparent);
+}
+
+/* Card content below the image */
+.app-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 28px 28px 32px;
+  flex: 1;
+}
+
+.app-card__name {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 1.8vw, 26px);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--navy);
+  margin: 0 0 6px;
+  letter-spacing: -0.015em;
+}
+
+.app-card__tagline {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--app-color) 85%, var(--navy));
+  margin: 0;
+  line-height: 1.4;
+}
+
+.app-card__desc {
+  font-size: 14px;
+  line-height: 1.68;
+  color: var(--muted);
+  margin: 0;
+  flex: 1;
+}
+
+/* Stats chips - 3 small pills showing key numbers */
+.app-card__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.app-card__stat {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 14px;
+  background: color-mix(in srgb, var(--app-color) 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--app-color) 22%, transparent);
+  border-radius: 12px;
+}
+
+.app-card__stat-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--app-color) 100%, var(--navy));
+  line-height: 1;
+}
+
+.app-card__stat-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  line-height: 1;
+}
+
+/* CTA link with app brand color as background */
+.app-card__cta {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 7px;
+  padding: 11px 20px;
+  background: var(--app-color);
+  color: var(--white);
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 8px 22px -10px color-mix(in srgb, var(--app-color) 75%, transparent);
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    gap var(--dur-fast) var(--ease-out),
+    filter var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
+}
+
+.app-card__cta:hover {
+  transform: translateY(-2px);
+  gap: 10px;
+  filter: brightness(1.1);
+  box-shadow: 0 14px 30px -10px color-mix(in srgb, var(--app-color) 85%, transparent);
+}
+
+/* ==========================================================================
+   GHL WORKFLOWS
+   Light cream section (no dark-section). Same shader bg as hero.
+   Two tabs: Process Mapping | Automation Workflows.
+   WorkflowViewer renders mermaid diagrams with pan + zoom.
+   ========================================================================== */
+.ghlwf {
+  padding: clamp(100px, 12vh, 160px) clamp(32px, 10vw, 160px) clamp(80px, 10vh, 140px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(40px, 5vh, 56px);
+  color: var(--navy);
+}
+
+.ghlwf__header {
+  max-width: 64ch;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ghlwf__eyebrow {
+  display: block;
+  font-size: var(--fs-eyebrow);
+  font-weight: 500;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--orange-ink);
+}
+
+.ghlwf__headline {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 5vw, 72px);
+  font-weight: 700;
+  line-height: 1.04;
+  color: var(--navy);
+  margin: 0;
+  letter-spacing: -0.025em;
+}
+
+.ghlwf__subhead {
+  font-size: 17px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 56ch;
+}
+
+/* Tab row - mirrors .projects__tabs light style */
+.ghlwf__tabs {
+  display: inline-flex;
+  align-self: flex-start;
+  gap: 6px;
+  padding: 6px;
+  background: var(--white);
+  border: 1px solid rgba(11, 30, 63, 0.1);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 4px 16px -8px rgba(11, 30, 63, 0.12);
+}
+
+.ghlwf__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 22px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 14.5px;
+  font-weight: 500;
+  font-family: inherit;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition:
+    background var(--dur-med) var(--ease-out),
+    color var(--dur-med) var(--ease-out);
+}
+
+.ghlwf__tab:hover:not(.is-active) {
+  color: var(--navy);
+  background: rgba(11, 30, 63, 0.05);
+}
+
+.ghlwf__tab.is-active {
+  background: var(--orange);
+  color: var(--white);
+  box-shadow: 0 8px 24px -12px rgba(255, 122, 26, 0.7);
+}
+
+.ghlwf__tab-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  background: rgba(11, 30, 63, 0.07);
+  border-radius: var(--radius-pill);
+}
+
+.ghlwf__tab.is-active .ghlwf__tab-count {
+  background: rgba(255, 255, 255, 0.22);
+  color: var(--white);
+}
+
+/* Split layout: code panel (left) + diagram viewer (right) */
+.ghlwf__split {
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* Code panel */
+.ghlwf__code-panel {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(11, 30, 63, 0.1);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: 0 4px 20px -8px rgba(11, 30, 63, 0.1);
+  height: clamp(520px, 72vh, 840px);
+}
+
+.ghlwf__code-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #1a2540;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.ghlwf__code-lang {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.ghlwf__code-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 11.5px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.ghlwf__code-copy:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--white);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.ghlwf__code-pre {
+  flex: 1;
+  overflow: auto;
+  margin: 0;
+  padding: 16px;
+  background: #111827;
+  font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #e2e8f0;
+  white-space: pre;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+
+.ghlwf__code-pre::-webkit-scrollbar { width: 6px; height: 6px; }
+.ghlwf__code-pre::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+}
+.ghlwf__code-pre code { font: inherit; color: inherit; }
+
+/* Empty state */
+.ghlwf__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 80px 0;
+  text-align: center;
+}
+
+.ghlwf__empty-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(11, 30, 63, 0.3);
+}
+
+.ghlwf__empty-body {
+  font-size: 16px;
+  color: var(--muted);
+  max-width: 36ch;
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   WORKFLOW VIEWER
+   Pan + zoom container for mermaid SVG diagrams.
+   ========================================================================== */
+.wf-viewer {
+  position: relative;
+  border: 1px solid rgba(11, 30, 63, 0.1);
+  border-radius: var(--radius-card);
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  overflow: hidden;
+  box-shadow:
+    0 20px 60px -24px rgba(11, 30, 63, 0.16),
+    0 4px 20px -8px rgba(11, 30, 63, 0.07);
+  height: clamp(520px, 72vh, 840px);
+  user-select: none;
+}
+
+/* Control buttons - top-right corner */
+.wf-viewer__controls {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+  display: flex;
+  gap: 6px;
+}
+
+.wf-viewer__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--white);
+  border: 1px solid rgba(11, 30, 63, 0.12);
+  cursor: pointer;
+  color: var(--navy);
+  font: inherit;
+  box-shadow: 0 2px 8px -4px rgba(11, 30, 63, 0.14);
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.wf-viewer__btn:hover {
+  background: var(--cream);
+  border-color: var(--orange);
+  color: var(--orange);
+}
+
+.wf-viewer__scale {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  min-width: 38px;
+  text-align: center;
+}
+
+/* Hint text - bottom center */
+.wf-viewer__hint {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: rgba(11, 30, 63, 0.35);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Canvas - the pannable area */
+.wf-viewer__canvas {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Inner wrapper - transform-origin center so diagram stays centered on zoom */
+.wf-viewer__inner {
+  display: inline-block;
+  transform-origin: center center;
+  will-change: transform;
+  user-select: none;
+}
+
+.wf-viewer__inner svg {
+  display: block;
+  max-width: none !important;
+  overflow: visible;
+}
+
+/* Loading and error states */
+.wf-viewer__loading,
+.wf-viewer__error {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.wf-viewer__error {
+  color: #ef4444;
+  padding: 24px;
+  text-align: center;
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   Bumped from 1024px to 1180px so the About 2-column layout (which was
+   visibly squeezing the headline + body + 2x2 stats against the portrait
+   on small laptops) collapses to a stacked single column earlier. Same
+   breakpoint catches the other 2-up section grids (contact strip, pain
+   cards, ghlwf split, hero photo) before they get cramped.
+   ========================================================================== */
+@media (max-width: 1180px) {
+  .hero {
+    padding: 140px var(--container-x) 0;
+    grid-template-columns: 1fr;
+    gap: 56px;
+    align-items: center;
+  }
+  .hero__copy {
+    padding-bottom: 0;
+  }
+  .hero__photo {
+    order: 2;
+    width: min(620px, 92%);
+    max-height: 82vh;
+    align-self: center;
+    justify-self: center;
+  }
+  .hero__photo-img {
+    max-height: 82vh;
+  }
+  .hero__badge {
+    width: 130px;
+    top: 72px;
+    left: 32px;
+  }
+  .about {
+    padding: clamp(56px, 8vh, 96px) var(--container-x) 120px;
+    gap: 72px;
+  }
+  .about__top {
+    grid-template-columns: 1fr;
+    gap: 56px;
+    align-items: start;
+  }
+  .about__portrait {
+    width: min(520px, 100%);
+    justify-self: center;
+  }
+  /* pillar bento stays 2-up down to 900px (handled in the base rules) */
+  .contact-strip {
+    padding: 100px var(--container-x);
+  }
+  .funnels {
+    padding: clamp(112px, 14vh, 160px) var(--container-x) 120px;
+    gap: 48px;
+  }
+  .funnels__panel {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .funnels__preview {
+    max-width: 640px;
+    width: 100%;
+    justify-self: start;
+  }
+  .funnels__thumbs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .funnels__thumb-item {
+    scroll-snap-align: start;
+  }
+  .pain {
+    padding: clamp(100px, 12vh, 140px) var(--container-x) 100px;
+    gap: 48px;
+  }
+  .pain__cards {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    gap: 20px;
+  }
+  .pain__card {
+    grid-row: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .pain__card-headline {
+    padding: 24px 24px 0;
+  }
+  .pain__card-text {
+    padding: 12px 24px 28px;
+  }
+  .services {
+    padding: clamp(80px, 10vh, 120px) var(--container-x) 100px;
+    gap: 48px;
+  }
+  /* Tablet: 2-col grid, last card spans both columns. Resets the
+     desktop-only nth-child column placements to auto. */
+  .services__grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: none;
+    gap: 16px;
+  }
+  .service-card:nth-child(1),
+  .service-card:nth-child(2),
+  .service-card:nth-child(3),
+  .service-card:nth-child(4),
+  .service-card:nth-child(5) {
+    grid-column: auto;
+  }
+  .service-card:nth-child(5) {
+    grid-column: span 2;
+  }
+  .service-card {
+    grid-row: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .projects {
+    padding: clamp(112px, 14vh, 160px) var(--container-x) 120px;
+    gap: 48px;
+  }
+  .ghlwf {
+    padding: clamp(80px, 10vh, 120px) var(--container-x) 80px;
+    gap: 40px;
+  }
+  .ghlwf__split {
+    grid-template-columns: 1fr;
+  }
+  .ghlwf__code-panel {
+    height: 300px;
+  }
+  .projects__apps {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .projects__tools {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (max-width: 720px) {
+  /* Mobile: always show the nav as a compact navy pill at the top.
+     Transparent default looked invisible against the cream hero on
+     phones - this keeps the nav legible from the first scroll and
+     reads as a proper mobile chrome. */
+  .nav {
+    top: 12px;
+    left: 50%;
+    transition: top 320ms var(--ease-out);
+    right: auto;
+    width: min(calc(100vw - 24px), 460px);
+    transform: translateX(-50%);
+    padding: 8px 20px 8px 8px;
+    background: var(--navy);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: var(--shadow-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .nav .nav__logo {
+    /* flex-shrink:0 stops the pill's flex layout from crushing the logo
+       when space is tight - the old bug squeezed it to ~12px. */
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    padding: 6px;
+  }
+  .nav.is-scrolled {
+    /* Already styled the same - keep the scrolled pill identical so
+       there's no jarring morph between top and scrolled states. */
+    width: min(calc(100vw - 24px), 460px);
+  }
+  /* The inline link row overflowed the compact pill on phones (4 labels
+     need ~304px). Hide it and switch to a hamburger + dropdown panel. */
+  .nav__links {
+    display: none;
+  }
+  .nav__toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    /* 44px touch target. */
+    width: 44px;
+    height: 44px;
+    margin-left: auto;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--white);
+    cursor: pointer;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .nav__toggle:hover {
+    color: var(--orange);
+  }
+  /* Dropdown panel anchored under the pill. Reuses the navy pill surface so
+     it reads as one object. Animated with transform + opacity only. */
+  .nav__menu {
+    display: block;
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    right: 0;
+    padding: 8px;
+    background: var(--navy);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+    transform-origin: top center;
+    transition:
+      opacity var(--dur-med) var(--ease-out),
+      transform var(--dur-med) var(--ease-spring),
+      visibility 0s linear var(--dur-med);
+    visibility: hidden;
+    pointer-events: none;
+  }
+  /* hidden attribute is the no-JS / collapsed default; clear its display:none
+     so the open state can animate in. The class drives visibility instead. */
+  .nav__menu[hidden] {
+    display: block;
+  }
+  .nav.is-menu-open .nav__menu {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    visibility: visible;
+    pointer-events: auto;
+    transition:
+      opacity var(--dur-med) var(--ease-out),
+      transform var(--dur-med) var(--ease-spring);
+  }
+  .nav__menu-list {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .nav__menu-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 48px;
+    padding: 12px 16px;
+    border-radius: calc(var(--radius-card) - 12px);
+    color: var(--white);
+    font-size: 16px;
+    font-weight: 500;
+    transition:
+      color var(--dur-fast) var(--ease-out),
+      background-color var(--dur-fast) var(--ease-out);
+  }
+  .nav__menu-link:hover {
+    color: var(--orange);
+    background: rgba(255, 255, 255, 0.06);
+  }
+  .nav__menu-link[aria-current='page'] {
+    color: var(--orange);
+  }
+  .nav__menu-link[aria-current='page']::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--orange);
+  }
+  .hero {
+    padding: 120px 24px 0;
+    gap: 40px;
+  }
+  .hero__copy {
+    gap: 24px;
+  }
+  .hero__actions {
+    gap: 20px;
+  }
+  .hero__photo {
+    width: min(460px, 95%);
+    max-height: 72vh;
+  }
+  .hero__photo-img {
+    max-height: 72vh;
+    filter: drop-shadow(0 24px 40px rgba(11, 30, 63, 0.2));
+  }
+  .hero__badge {
+    width: 100px;
+    top: 56px;
+    left: 20px;
+  }
+  .about {
+    padding: clamp(48px, 7vh, 72px) 24px 96px;
+    gap: 56px;
+  }
+  .about__portrait {
+    width: 100%;
+  }
+  .about__intro {
+    padding-bottom: 0;
+  }
+  .contact-strip {
+    padding: 80px 24px;
+  }
+  .tools-marquee {
+    padding: 0;
+  }
+  .tools-marquee__track {
+    gap: 44px;
+    padding: 22px 24px;
+  }
+  .tools-marquee__item {
+    padding-right: 44px;
+    font-size: 14px;
+    gap: 10px;
+  }
+  .funnels {
+    padding: clamp(96px, 12vh, 120px) 24px 80px;
+    gap: 36px;
+  }
+  .funnels__headline {
+    font-size: clamp(36px, 10vw, 48px);
+  }
+  .funnels__tabs {
+    width: 100%;
+    align-self: stretch;
+    overflow-x: auto;
+  }
+  .funnels__tab {
+    padding: 10px 16px;
+    font-size: 13px;
+    flex: 1 0 auto;
+    justify-content: center;
+  }
+  .funnels__panel {
+    gap: 32px;
+  }
+  .funnels__details {
+    gap: 18px;
+  }
+  .funnels__detail-title {
+    font-size: clamp(24px, 6vw, 32px);
+  }
+  .funnels__cta {
+    padding: 12px 22px;
+  }
+  .funnels__thumb {
+    width: 180px;
+  }
+  .funnels__thumb-label {
+    font-size: 13px;
+  }
+  .pain {
+    padding: clamp(80px, 10vh, 100px) 24px 80px;
+    gap: 36px;
+  }
+  .pain__headline {
+    font-size: clamp(36px, 10vw, 48px);
+  }
+  .services {
+    padding: clamp(64px, 8vh, 80px) 24px 80px;
+    gap: 32px;
+  }
+  /* Mobile: single column, every card full-width. Resets the desktop
+     nth-child placements completely. */
+  .services__grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .service-card:nth-child(1),
+  .service-card:nth-child(2),
+  .service-card:nth-child(3),
+  .service-card:nth-child(4),
+  .service-card:nth-child(5) {
+    grid-column: 1 / -1;
+  }
+  .service-card {
+    padding: 24px 20px 28px;
+  }
+  .projects {
+    padding: clamp(96px, 12vh, 120px) 24px 80px;
+    gap: 36px;
+  }
+  .projects__headline {
+    font-size: clamp(36px, 10vw, 48px);
+  }
+  .projects__tabs {
+    width: 100%;
+    align-self: stretch;
+    overflow-x: auto;
+  }
+  .projects__tab {
+    padding: 10px 16px;
+    font-size: 13px;
+    flex: 1 0 auto;
+    justify-content: center;
+  }
+  .projects__apps {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .projects__tools {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .tool-card {
+    padding: 14px 16px;
+    gap: 12px;
+  }
+  .app-card__body {
+    padding: 22px 20px 26px;
+  }
+}
+
+/* ============================================
+   BRANDS (section 04) - two-client credential rows
+   Sits on the cream shader page (light mode),
+   below the About section. Editorial list with
+   oversized ghosted index, logo medallion, big
+   brand name, draw-in dividers and wash-on-hover.
+   ============================================ */
+.brands {
+  padding: clamp(80px, 11vh, 150px) 0 var(--section-pad-y);
+}
+
+.brands__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--container-x);
+}
+
+.brands__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 18px;
+  margin-bottom: clamp(40px, 5vw, 64px);
+}
+
+.brands__eyebrow {
+  display: block;
+  font-size: var(--fs-eyebrow);
+  font-weight: 500;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--orange);
+}
+
+.brands__headline {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(36px, 4.5vw, 60px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: var(--navy);
+}
+
+.brands__subhead {
+  margin: 0 auto;
+  max-width: 46ch;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* two separate ledger cells in a 2-up grid. minmax(0,1fr) guards the mobile
+   blow-out where a wide child sizes the column to its min-content. */
+.brands__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: clamp(16px, 2.4vw, 28px);
+}
+
+/* each client is its own framed card - lifts off the busy shader swirls */
+.brands__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* uniform trio - grid stretch pulls all three to the same row height, copy
+     is balanced so the cards read as aligned squares */
+  padding: clamp(24px, 2.8vw, 36px);
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--white) 64%, transparent);
+  box-shadow: 0 1px 0 rgba(11, 30, 63, 0.03);
+  /* entrance: rise + fade, staggered card-to-card */
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 620ms var(--ease-out),
+    transform 560ms var(--ease-spring),
+    box-shadow var(--dur-med) var(--ease-out),
+    border-color var(--dur-med) var(--ease-out);
+}
+
+.brands.is-revealed .brands__card {
+  opacity: 1;
+  transform: none;
+}
+.brands.is-revealed .brands__card:nth-child(1) { transition-delay: 100ms; }
+.brands.is-revealed .brands__card:nth-child(2) { transition-delay: 190ms; }
+.brands.is-revealed .brands__card:nth-child(3) { transition-delay: 280ms; }
+
+/* card body - fills the card; an <a> when the client links out, a <div> when
+   it does not. Inherits colour, strips link underline, carries the focus ring. */
+.brands__card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  color: inherit;
+  text-decoration: none;
+  border-radius: calc(var(--radius-card) - 10px);
+}
+a.brands__card-body { cursor: pointer; }
+a.brands__card-body:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 6px;
+}
+
+/* corner crosshairs - the signature motif, now per card, drawn in on reveal */
+.brands__cross {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  z-index: 2;
+  background:
+    linear-gradient(var(--divider), var(--divider)) center / 100% 1.5px no-repeat,
+    linear-gradient(var(--divider), var(--divider)) center / 1.5px 100% no-repeat;
+  opacity: 0;
+  transition:
+    opacity 460ms var(--ease-out),
+    transform 460ms var(--ease-spring),
+    background var(--dur-med) var(--ease-out);
+}
+.brands__cross--tl { top: 0; left: 0; transform: translate(-50%, -50%) scale(0.3); }
+.brands__cross--tr { top: 0; right: 0; transform: translate(50%, -50%) scale(0.3); }
+.brands__cross--bl { bottom: 0; left: 0; transform: translate(-50%, 50%) scale(0.3); }
+.brands__cross--br { bottom: 0; right: 0; transform: translate(50%, 50%) scale(0.3); }
+
+.brands.is-revealed .brands__cross { opacity: 1; transition-delay: 320ms; }
+.brands.is-revealed .brands__cross--tl { transform: translate(-50%, -50%) scale(1); }
+.brands.is-revealed .brands__cross--tr { transform: translate(50%, -50%) scale(1); }
+.brands.is-revealed .brands__cross--bl { transform: translate(-50%, 50%) scale(1); }
+.brands.is-revealed .brands__cross--br { transform: translate(50%, 50%) scale(1); }
+
+/* top row: ghosted index watermark on the left, logo medallion on the right */
+.brands__card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.brands__index {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 5vw, 64px);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: color-mix(in srgb, var(--navy) 9%, transparent);
+}
+
+/* medallion - made to stand out: bright white tile, crisp ring, a soft orange
+   halo + lift so the client logo reads as the hero of the top row. */
+.brands__medallion {
+  position: relative;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: clamp(60px, 6.6vw, 76px);
+  height: clamp(60px, 6.6vw, 76px);
+  background: #ffffff;
+  border: 1px solid rgba(11, 30, 63, 0.1);
+  border-radius: 20px;
+  box-shadow:
+    0 10px 26px -12px rgba(11, 30, 63, 0.4),
+    0 0 0 4px rgba(255, 122, 26, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  transition:
+    transform var(--dur-med) var(--ease-spring),
+    box-shadow var(--dur-med) var(--ease-out);
+}
+
+.brands__logo {
+  width: 58%;
+  height: 58%;
+  object-fit: contain;
+  color: var(--navy);
+}
+/* Real client logo (raster) - a touch larger than the vector fallback so the
+   mark fills the white medallion tile evenly. */
+.brands__logo--img {
+  width: 68%;
+  height: 68%;
+}
+
+.brands__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2.2vw, 28px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--navy);
+}
+
+.brands__role {
+  margin: 4px 0 0;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.brands__daily {
+  margin: 14px 0 0;
+  max-width: 40ch;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+/* footer: work tags on the left, arrow on the right (linked card only),
+   divided from the body and pinned to the card's bottom edge. Top-aligned +
+   a fixed two-line work-tag reserve so the divider sits at the SAME height
+   across all three cards, even when one tag wraps and another is a single
+   line - that is what keeps the row of footers looking aligned. */
+.brands__card-foot {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--divider);
+}
+
+.brands__work {
+  font-size: var(--fs-eyebrow);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  line-height: 1.5;
+  /* reserve two lines so single- and double-line tags occupy equal height */
+  min-height: calc(1.5em * 2);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.brands__arrow {
+  flex-shrink: 0;
+  color: var(--muted);
+  transition:
+    color var(--dur-med) var(--ease-out),
+    transform var(--dur-med) var(--ease-spring);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  /* only the linked card lifts/responds - the non-linked card stays static so
+     it never reads as clickable */
+  .brands__card--link:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--orange) 35%, var(--divider));
+    box-shadow: 0 14px 36px -22px rgba(6, 12, 26, 0.5);
+  }
+  .brands__card--link:hover .brands__medallion {
+    transform: translateY(-3px) scale(1.04);
+    box-shadow:
+      0 16px 36px -16px rgba(11, 30, 63, 0.4),
+      0 0 0 4px rgba(255, 122, 26, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  }
+  .brands__card--link:hover .brands__cross--tl,
+  .brands__card--link:hover .brands__cross--tr {
+    background:
+      linear-gradient(var(--orange), var(--orange)) center / 100% 1.5px no-repeat,
+      linear-gradient(var(--orange), var(--orange)) center / 1.5px 100% no-repeat;
+  }
+  .brands__card--link:hover .brands__arrow {
+    color: var(--orange);
+    transform: translate(2px, -2px);
+  }
+}
+
+@media (max-width: 980px) {
+  .brands__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+}
+@media (max-width: 720px) {
+  .brands__header {
+    margin-bottom: clamp(32px, 8vw, 44px);
+  }
+}
+
+/* The mobile notice banner is fixed at the top too: while it shows, the nav
+   pill sits under it (two lines of banner on narrow phones). */
+html.has-notice .nav { top: 62px; }
+@media (max-width: 480px) {
+  html.has-notice .nav { top: 78px; }
+}

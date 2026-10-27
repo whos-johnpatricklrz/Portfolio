@@ -1,0 +1,429 @@
+/* ============================================
+   HOME BENTO - one card per view
+   The showcase band of Home. Six raised paper cards on a 4x2 grid that fills
+   the elastic row; every card is a link and clips its own media, so the band
+   can shrink with the viewport and Home never grows a scrollbar. Motion is
+   transform-only on inner tracks. Light plates stay light in dark mode for
+   the brand marks (see shell.css), but the cards themselves flip with the
+   theme.
+   ============================================ */
+.bento {
+  display: grid;
+  gap: clamp(10px, 1vw, 16px);
+  min-height: 0;
+  min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 1100px) {
+  .bento {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+  }
+  .bento__card--projects { grid-column: span 2; }
+  .bento__card--quotes   { grid-column: span 2; }
+}
+
+.bento__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  padding: clamp(12px, 1.4vh, 18px) clamp(12px, 1.1vw, 18px);
+  border-radius: var(--radius-card);
+  background: var(--paper);
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid var(--line-strong);
+  box-shadow:
+    0 1px 2px rgba(6, 12, 26, 0.04),
+    0 24px 50px -36px rgba(6, 12, 26, 0.45);
+  transition:
+    transform var(--dur-med) var(--ease-spring),
+    box-shadow var(--dur-med) var(--ease-out);
+}
+.bento__card:hover {
+  transform: translateY(-3px);
+  border-color: var(--orange);
+  box-shadow:
+    0 1px 2px rgba(6, 12, 26, 0.05),
+    0 32px 60px -34px rgba(6, 12, 26, 0.55);
+}
+.bento__card:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
+
+/* ---------- Head ---------- */
+.bento__head {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: none;
+}
+/* Icon and title share a row: the tile is filled orange and the title is
+   caps, so the card's name is the first thing the eye lands on. */
+.bento__label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-right: 22px;
+}
+.bento__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: var(--orange);
+  color: var(--white);
+  box-shadow: 0 8px 18px -10px rgba(255, 122, 26, 0.9);
+  transition: transform var(--dur-med) var(--ease-spring);
+}
+.bento__card:hover .bento__icon { transform: translateY(-2px) rotate(-4deg); }
+.bento__title {
+  font-family: var(--font-display);
+  font-size: clamp(15px, 1.05vw, 18px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--navy);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.bento__card:hover .bento__title { color: var(--orange-ink); }
+.bento__desc {
+  font-size: clamp(11.5px, 0.74vw, 13px);
+  line-height: 1.4;
+  color: var(--muted);
+}
+.bento__arrow {
+  position: absolute;
+  top: 2px;
+  right: 0;
+  color: var(--orange);
+  opacity: 0;
+  transform: translate(-4px, 4px);
+  transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-med) var(--ease-spring);
+}
+.bento__card:hover .bento__arrow { opacity: 1; transform: none; }
+
+/* ---------- Media slot ---------- */
+.bento__media {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-top: clamp(8px, 1.2vh, 14px);
+}
+
+/* Projects: two columns side by side in the wide card - the head on the left,
+   the drifting reel on the right. */
+.bento__card--projects { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 14px; }
+.bento__card--projects .bento__media { margin-top: 0; grid-row: 1; grid-column: 2; }
+.bento__reel {
+  overflow: hidden;
+  border-radius: 14px;
+  mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+}
+.bento__reel-track {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: bento-drift-up 22s linear infinite;
+  animation-play-state: paused;
+}
+/* Still until pointed at: three tracks drifting at once gave the eye nothing to land on. */
+.bento__card:hover .bento__reel-track { animation-play-state: running; }
+/* Each shot is a small browser window: a chrome bar with three dots over the
+   top of the page, so the crop reads as a screen, not a zoomed photo. */
+.bento__shot {
+  display: block;
+  flex: none;
+  padding: 18px 4px 4px;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  background: var(--white);
+  box-shadow: inset 0 0 0 1px var(--line), 0 10px 24px -16px rgba(6, 12, 26, 0.6);
+}
+.bento__shot::before {
+  content: '';
+  position: absolute;
+  top: 7px;
+  left: 9px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--orange);
+  box-shadow: 10px 0 0 var(--line-strong), 20px 0 0 var(--line-strong);
+}
+.bento__shot img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 7px;
+}
+@keyframes bento-drift-up {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-50%); }
+}
+
+/* About: three photos fanned like a hand of cards. */
+.bento__fan { display: grid; place-items: center; }
+.bento__photo {
+  grid-area: 1 / 1;
+  display: block;
+  width: clamp(72px, 5.6vw, 96px);
+  aspect-ratio: 3 / 4;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--plate);
+  box-shadow: 0 0 0 3px var(--white), 0 14px 30px -14px rgba(6, 12, 26, 0.6);
+  transform: rotate(calc((var(--i) - 1) * 9deg)) translateX(calc((var(--i) - 1) * 26px));
+  transition: transform var(--dur-slow) var(--ease-spring);
+}
+.bento__photo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; }
+.bento__card:hover .bento__photo {
+  transform: rotate(calc((var(--i) - 1) * 14deg)) translateX(calc((var(--i) - 1) * 34px)) translateY(-4px);
+}
+
+/* Tools: two chip rows scrolling against each other. */
+.bento__chips {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+}
+.bento__chip-row { overflow: hidden; }
+.bento__chip-track {
+  display: flex;
+  gap: 8px;
+  width: max-content;
+  animation: bento-drift-left 26s linear infinite;
+  animation-play-state: paused;
+}
+.bento__chip-row[data-dir='right'] .bento__chip-track { animation-direction: reverse; }
+.bento__card:hover .bento__chip-track { animation-play-state: running; }
+.bento__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: none;
+  height: 32px;
+  padding: 0 12px 0 9px;
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--navy);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.bento__chip svg { color: var(--orange); flex: none; }
+/* Status as n8n-ish dot: green for live, muted for internal. */
+.bento__chip[data-status]::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  margin-left: 2px;
+  border-radius: 50%;
+  background: var(--line-strong);
+}
+.bento__chip[data-status='Live']::after { background: #22A15C; }
+@keyframes bento-drift-left {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* Credentials: the GHL badge on a ring. */
+.bento__badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.bento__badge-ring {
+  display: grid;
+  place-items: center;
+  width: clamp(76px, 6.4vw, 104px);
+  height: clamp(76px, 6.4vw, 104px);
+  border-radius: 50%;
+  background: var(--white);
+  box-shadow: inset 0 0 0 1px var(--line), 0 0 0 8px var(--tint), 0 16px 30px -18px rgba(6, 12, 26, 0.6);
+  transition: transform var(--dur-slow) var(--ease-spring);
+}
+.bento__badge-ring img { width: 66%; height: 66%; object-fit: contain; }
+.bento__card:hover .bento__badge-ring { transform: scale(1.06) rotate(-6deg); }
+.bento__badge-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: var(--radius-pill);
+  background: var(--navy);
+  color: var(--cream);
+  font-size: 11px;
+  font-weight: 600;
+}
+.bento__badge-tag svg { color: var(--verified); }
+
+/* Services: the five offers, title only. */
+.bento__card--services .bento__media { margin-top: clamp(4px, 0.7vh, 10px); }
+.bento__offers {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  list-style: none;
+  overflow: hidden;
+  /* The list is a size container: five rows split its height evenly and the
+     tile and type scale from it (cqh), so the same markup fits a 720px
+     laptop and a 1440px monitor. The note line appears once there is room. */
+  container-type: size;
+}
+/* Each offer is a ledger row: orange-tinted tile, title (over a short note
+   when tall enough), its index on the right in tabular figures. Rows stagger
+   a few px right on card hover so the list reads as one object waking up. */
+.bento__offer {
+  display: flex;
+  align-items: center;
+  gap: clamp(7px, 3cqh, 10px);
+  flex: 1 1 0;
+  min-height: 0;
+  padding: 0 2px;
+  color: var(--navy);
+  transition: transform var(--dur-med) var(--ease-spring);
+  transition-delay: calc(var(--i, 0) * 28ms);
+}
+.bento__offer + .bento__offer { border-top: 1px solid var(--line); }
+.bento__offer-tile {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: clamp(18px, 14cqh, 28px);
+  height: clamp(18px, 14cqh, 28px);
+  border-radius: clamp(6px, 4.5cqh, 9px);
+  background: color-mix(in srgb, var(--orange) 12%, transparent);
+  color: var(--orange);
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.bento__offer-tile svg { width: clamp(11px, 7.5cqh, 15px); height: clamp(11px, 7.5cqh, 15px); }
+.bento__offer-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1 1 auto;
+  line-height: 1.2;
+}
+.bento__offer-title {
+  font-size: clamp(11px, 6.8cqh, 13.5px);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bento__offer-note {
+  display: none;
+  font-size: clamp(10.5px, 5cqh, 11.5px);
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bento__offer-num {
+  flex: none;
+  font-family: var(--font-display);
+  font-size: clamp(9.5px, 5.5cqh, 11px);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, var(--navy) 32%, transparent);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+@container (min-height: 225px) {
+  .bento__offer-note { display: block; }
+}
+.bento__card:hover .bento__offer { transform: translateX(3px); }
+.bento__card:hover .bento__offer-tile { background: var(--orange); color: var(--white); }
+.bento__card:hover .bento__offer-num { color: var(--orange-ink); }
+
+/* Testimonials: head left, review column drifting up on the right. */
+.bento__card--quotes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); column-gap: 14px; }
+.bento__card--quotes .bento__media { margin-top: 0; grid-row: 1; grid-column: 2; }
+.bento__reviews {
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+}
+.bento__reviews-track {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: bento-drift-up 20s linear infinite;
+  animation-play-state: paused;
+}
+.bento__card:hover .bento__reviews-track { animation-play-state: running; }
+.bento__review {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: none;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--white);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.bento__review-top { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--navy); }
+.bento__review-top img { width: 18px; height: 18px; border-radius: 5px; object-fit: contain; }
+.bento__review-top svg { color: var(--orange); }
+.bento__review-role { font-size: 11.5px; line-height: 1.4; color: var(--muted); }
+.bento__review-work { font-size: 11px; font-weight: 600; color: var(--orange-ink); }
+
+/* Below the shell breakpoint the grid has no fixed rows, so the tracks would
+   set the card height. Cap the media instead, and let the two wide cards
+   stack their media under the head - side by side they had 80px each. */
+@media (max-width: 1099px) {
+  .bento__reel, .bento__reviews, .bento__fan, .bento__chips, .bento__badge { max-height: 200px; }
+  .bento__fan { min-height: 150px; }
+  .bento__card--projects,
+  .bento__card--quotes { display: flex; flex-direction: column; }
+  .bento__card--projects .bento__media,
+  .bento__card--quotes .bento__media { margin-top: clamp(8px, 1.2vh, 14px); height: 190px; }
+  /* The reel runs sideways under the head: a row of browser windows at a
+     size where a page crop reads as a page, not one giant hero. */
+  .bento__reel {
+    height: 150px;
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+  .bento__reel-track { flex-direction: row; width: max-content; animation-name: bento-drift-left; animation-duration: 26s; }
+  .bento__shot { width: 200px; }
+}
+@media (max-width: 639px) {
+  .bento__card { padding: 14px; }
+  .bento__icon { width: 32px; height: 32px; }
+}
+/* One column on phones: two 170px cards is a pair of slivers. */
+@media (max-width: 639px) {
+  .bento { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bento__reel-track, .bento__chip-track, .bento__reviews-track { animation: none; }
+}
+
+/* Phone type floor. */
+@media (max-width: 639px) {
+  .bento__desc { font-size: 13px; }
+  .bento__badge-tag, .bento__review-work { font-size: 12px; }
+  .bento__review-role { font-size: 12.5px; }
+}

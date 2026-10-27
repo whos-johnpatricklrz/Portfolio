@@ -1,0 +1,266 @@
+/* ============================================
+   PROFILE RAIL - the fixed left column (desktop only)
+   Below 1100px it is hidden and NavBar's floating pill is the navigation.
+   ============================================ */
+.rail { display: none; }
+
+@media (min-width: 1100px) {
+  .rail {
+    display: block;
+    position: relative;
+    z-index: 700;
+    width: var(--rail-w);
+    flex: 0 0 var(--rail-w);
+    height: 100%;
+    padding: clamp(28px, 4vh, 52px) 30px 28px;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .rail::-webkit-scrollbar { display: none; }
+
+  .rail__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100%;
+  }
+
+  /* Tied to viewport height, not fixed: at 800px tall the fixed sizes pushed
+     the column past the shell and the copyright scrolled out of sight. */
+  .rail__avatar {
+    position: relative;
+    display: block;
+    width: clamp(132px, 21vh, 190px);
+    aspect-ratio: 1;
+    /* The full cutout figure, no crop and no disc: it sits straight on the
+       page the way About seats it, with only a soft orange glow behind. */
+  }
+  .rail__avatar::before {
+    content: '';
+    position: absolute;
+    inset: 18% 4% 0;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 50% 70%, rgba(255, 122, 26, 0.32), transparent 66%);
+    filter: blur(22px);
+    pointer-events: none;
+  }
+  .rail__avatar img {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center bottom;
+    filter: drop-shadow(0 14px 22px rgba(6, 12, 26, 0.35));
+    /* The cutout ends in a flat line across the tee. One ellipse anchored
+       high dissolves the bottom edge and both shoulders into the page while
+       the head stays fully opaque - the same fade About uses. */
+    -webkit-mask-image: radial-gradient(ellipse 80% 86% at 50% 24%, #000 50%, transparent 100%);
+    mask-image: radial-gradient(ellipse 80% 86% at 50% 24%, #000 50%, transparent 100%);
+  }
+
+  .rail__name {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 20px;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: var(--navy);
+  }
+  /* Platform signal, not brand furniture: this one stays Facebook blue in
+     both themes rather than following --orange. */
+  .rail__name svg { color: var(--verified); flex-shrink: 0; }
+
+  .rail__handle {
+    margin-top: 5px;
+    font-size: 14.5px;
+    color: var(--muted);
+  }
+  /* live visitor count, the same stat the phone shell shows */
+  .rail__visits {
+    color: var(--muted);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .rail__visits::before { content: ' · '; color: var(--muted); font-weight: 400; }
+
+  /* Round-button row: the three social plates plus the theme switch. One row,
+     one size, so the rail has a single band of controls instead of two. */
+  .rail__actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .rail__theme {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-circle);
+    background: var(--white);
+    color: var(--navy);
+    box-shadow: inset 0 0 0 1px var(--line);
+    transition: transform var(--dur-med) var(--ease-spring),
+                box-shadow var(--dur-fast) var(--ease-out);
+  }
+  .rail__theme:hover {
+    transform: translateY(-2px);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+  }
+
+  /* ---------- Social row ----------
+     Circular plates, the mark tinted by currentColor through a CSS mask so one
+     black silhouette per brand serves both themes. */
+  .rail__socials {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    list-style: none;
+  }
+  .rail__social {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-circle);
+    background: var(--white);
+    color: var(--navy);
+    box-shadow:
+      inset 0 0 0 1px var(--line),
+      0 10px 24px -18px rgba(6, 12, 26, 0.55);
+    transition: transform var(--dur-med) var(--ease-spring),
+                color var(--dur-fast) var(--ease-out),
+                box-shadow var(--dur-fast) var(--ease-out);
+  }
+  .rail__social:hover {
+    transform: translateY(-2px);
+    color: var(--orange);
+    box-shadow:
+      inset 0 0 0 1px var(--line-strong),
+      0 14px 28px -18px rgba(6, 12, 26, 0.6);
+  }
+  .rail__social-icon {
+    display: block;
+    width: 20px;
+    height: 20px;
+    background: currentColor;
+    -webkit-mask: var(--icon-url) center / contain no-repeat;
+            mask: var(--icon-url) center / contain no-repeat;
+  }
+
+  .rail__nav {
+    width: 100%;
+    margin-top: clamp(20px, 3vh, 32px);
+    padding-top: clamp(18px, 2.6vh, 28px);
+    border-top: 1px solid var(--line);
+  }
+  .rail__nav ul { display: flex; flex-direction: column; gap: 3px; list-style: none; }
+  .rail__link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    height: clamp(46px, 6vh, 54px);
+    padding: 0 16px;
+    border-radius: 14px;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--muted);
+    transition: color var(--dur-fast) var(--ease-out),
+                background var(--dur-fast) var(--ease-out),
+                transform var(--dur-med) var(--ease-spring);
+  }
+  .rail__link svg { flex-shrink: 0; opacity: 0.85; }
+
+  /* ---------- Its Hover icon motion, in CSS ----------
+     Their components drive these with motion/react. The parts carry the same
+     classes here and the hover state drives them instead, so the motion is
+     identical with no runtime.
+
+     `transform-box: fill-box` is load-bearing: without it an SVG child's
+     transform-origin resolves against the whole user-space viewport, not the
+     shape, and every "scale from the centre" lands somewhere else entirely. */
+  .ricon [class^='ricon__'] {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition:
+      transform 300ms var(--ease-out),
+      opacity 300ms var(--ease-out);
+  }
+
+  .ricon--slab { display: inline-grid; place-items: center; }
+  .ricon__whole { transition: transform 300ms var(--ease-spring); }
+  .rail__link:hover .ricon__whole { transform: translateY(-1.5px) rotate(-6deg) scale(1.08); }
+
+  .rail__link:hover .ricon__roof { transform: translateY(-1.5px); }
+  .rail__link:hover .ricon__house { transform: scale(1.06); }
+  .rail__link:hover .ricon__door { transform: scaleY(1.12); transform-origin: center bottom; }
+
+  .rail__link:hover .ricon__folder { transform: translateY(-1.5px) scale(1.05); }
+
+  .rail__link:hover .ricon__layer-top { transform: translateY(-2px) scale(1.06); }
+  .rail__link:hover .ricon__layer-bottom { transform: translateY(1px); opacity: 0.65; }
+
+  .ricon__star-fill { opacity: 0; transform: scale(0.8); }
+  .rail__link:hover .ricon__star-fill { opacity: 1; transform: scale(1); }
+  .rail__link:hover .ricon__star-line { transform: scale(1.08) rotate(-6deg); }
+
+  .ricon__steam { opacity: 0.55; }
+  .rail__link:hover .ricon__cup { transform: translateY(1px); }
+  .rail__link:hover .ricon__steam { opacity: 1; transform: translateY(-2px); }
+
+  .rail__link:hover .ricon__user { transform: translateY(-1px) scale(1.06); }
+
+  /* The bubble draws itself. stroke-dashoffset is not a compositor property,
+     but this is one 18px path and the same technique the old intro used. */
+  .ricon__msg {
+    stroke-dasharray: 74;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 600ms var(--ease-out), transform 300ms var(--ease-out);
+  }
+  .rail__link:hover .ricon__msg {
+    animation: ricon-draw 700ms var(--ease-out);
+  }
+  @keyframes ricon-draw {
+    0% { stroke-dashoffset: 74; }
+    70% { stroke-dashoffset: 0; transform: scale(1); }
+    85% { transform: scale(1.06); }
+    100% { stroke-dashoffset: 0; transform: scale(1); }
+  }
+
+  /* The active row keeps its icon in the rested state, just accented. */
+  .rail__link.active .ricon__star-fill { opacity: 1; transform: scale(1); }
+  .rail__link:hover {
+    color: var(--navy);
+    background: var(--white);
+    transform: translateX(3px);
+  }
+  .rail__link.active {
+    color: var(--navy);
+    font-weight: 600;
+    background: var(--white);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .rail__link.active svg { color: var(--orange); opacity: 1; }
+
+  .rail__copy {
+    width: 100%;
+    margin-top: auto;
+    padding-top: clamp(24px, 4vh, 40px);
+    border-top: 1px solid var(--line);
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--muted);
+    /* left-aligned past the accessibility button that sits in this corner */
+    padding-left: 52px;
+    text-align: left;
+  }
+
+  /* The rail IS the navigation up here, so the floating pill steps aside and
+     the page keeps exactly one navigation surface. */
+  .nav { display: none; }
+}

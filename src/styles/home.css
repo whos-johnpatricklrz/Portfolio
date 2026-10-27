@@ -1,0 +1,287 @@
+/* ============================================
+   HOME - the fixed viewport
+   Three bands in a grid of `auto auto 1fr`: the head, the tools marquee, and
+   the workflow. The workflow row is the elastic one, so a shorter viewport
+   shrinks the diagram instead of producing a scrollbar. Nothing here may add
+   height the panel cannot hold.
+   ============================================ */
+.home {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(28px, 5vh, 64px) var(--panel-x) clamp(16px, 3vh, 32px);
+  gap: clamp(16px, 2.4vh, 34px);
+}
+
+@media (min-width: 1100px) {
+  .home {
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    min-height: 0;
+    /* Without this a nowrap child sets the grid's min-content width and the
+       whole column - marquee and workflow included - is laid out wider than
+       the panel and clipped. The panel must stay authoritative. */
+    min-width: 0;
+  }
+  .home__head { min-width: 0; }
+}
+
+/* ---------- Head ---------- */
+.home__headline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: clamp(20px, 4vw, 56px);
+}
+
+/* One line, never two. The size is bounded by what fits beside the CTA in the
+   panel at the 1100px breakpoint, not by what looks biggest at 1440. Below the
+   breakpoint the headline gets the full width and is allowed to wrap - a
+   29-character sentence cannot be one legible line on a 390px phone. */
+.home__title {
+  display: flex;
+  flex-direction: column;
+  font-size: clamp(30px, 3.5vw, 72px);
+  font-weight: 700;
+  letter-spacing: var(--ls-display);
+  line-height: 1.06;
+  color: var(--navy);
+}
+.home__line { display: block; }
+
+@media (min-width: 1100px) {
+  .home__line { white-space: nowrap; }
+}
+
+.home__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  height: 46px;
+  padding: 0 22px;
+  border-radius: var(--radius-pill);
+  background: var(--navy);
+  color: var(--cream);
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: var(--shadow-btn);
+  transition: transform var(--dur-med) var(--ease-spring),
+              background var(--dur-fast) var(--ease-out);
+}
+.home__cta svg { color: var(--orange); }
+.home__cta:hover { transform: translateY(-2px); }
+
+/* One line, from 1400px up.
+   The sentence is 130 characters. Measured against the panel it needs roughly
+   0.65 x the viewport width to sit on one line, and the panel only offers that
+   from ~1400px: at 1100 it would have to drop to ~11px to fit, which is not a
+   readable lede, it is a compliance trick. So it wraps below the threshold
+   rather than shrinking into unreadability. Shorten the copy to ~80 characters
+   and this can be one line at every width. */
+.home__lede {
+  margin-top: clamp(12px, 1.8vh, 22px);
+  /* a reading measure, not the container: ~70 characters, balanced lines */
+  max-width: 70ch;
+  font-size: clamp(14px, 1.05vw, 22px);
+  line-height: 1.6;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+/* The marquee still carries the horizontal inset it needed as a full-bleed
+   band on the old long page. Home already supplies that padding, so drop it
+   and let the strip line up with the workflow window below it. */
+.home .tools-marquee { margin: 0; border-radius: 14px; border: 1px solid var(--line-strong); }
+/* Smaller on Home: the strip is a band under the head, not a section. */
+.home .tools-marquee__track { gap: 44px; padding: 14px 28px; }
+.home .tools-marquee__item { gap: 10px; padding-right: 44px; font-size: 13.5px; }
+.home .tools-marquee__item::after { height: 16px; }
+.home .tools-marquee__icon, .home .tools-marquee__img { width: 20px; height: 20px; }
+/* Phones: the 44px gaps left two logos on screen. Pack the strip. */
+@media (max-width: 640px) {
+  .home .tools-marquee__track { gap: 22px; padding: 10px 14px; }
+  .home .tools-marquee__item { gap: 8px; padding-right: 22px; font-size: 12px; }
+  .home .tools-marquee__icon, .home .tools-marquee__img { width: 18px; height: 18px; }
+  .home__glass { padding: 12px; border-radius: var(--radius-card); gap: 12px; }
+  .home__tools { gap: 8px; }
+}
+
+/* ---------- Glass panel ----------
+   One frosted plate carries the tools band and the bento down to the bottom
+   of the viewport, so the head floats on the contour page and everything
+   below it sits on a single surface.
+   No backdrop-filter, on purpose: the shader animates behind the plate, so a
+   blur here is recomputed over the whole plate every frame. That was the lag
+   on 2026-09-13 - even on a strong GPU at 165Hz, where the perf gate in
+   lib/perf.ts never trips. The plate is painted near-opaque instead. */
+.home__glass {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2vh, 26px);
+  min-height: 0;
+  min-width: 0;
+  padding: clamp(14px, 2vh, 24px) clamp(14px, 1.4vw, 24px);
+  border-radius: calc(var(--radius-card) + 6px);
+  /* White on the left, cooling to a soft blue on the right - one sweep, so
+     the panel reads as a single sheet, not a tinted box. */
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 38%),
+    linear-gradient(100deg,
+      rgba(255, 255, 255, 0.97) 0%,
+      rgba(255, 255, 255, 0.93) 42%,
+      rgba(219, 231, 255, 0.95) 76%,
+      rgba(186, 209, 255, 0.96) 100%);
+  box-shadow:
+    inset 0 0 0 1px var(--line),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 30px 70px -40px rgba(6, 12, 26, 0.5);
+}
+[data-theme='dark'] .home__glass {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 38%),
+    linear-gradient(100deg,
+      rgba(16, 24, 42, 0.96) 0%,
+      rgba(16, 26, 48, 0.94) 42%,
+      rgba(18, 40, 96, 0.94) 76%,
+      rgba(24, 56, 140, 0.93) 100%);
+  box-shadow:
+    inset 0 0 0 1px var(--line),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 30px 70px -40px rgba(0, 0, 0, 0.8);
+}
+@media (min-width: 1100px) {
+  .home__glass--showcase { height: 100%; display: grid; grid-template-rows: minmax(0, 1fr); }
+}
+
+/* ---------- Tools band ----------
+   The label is a title block on the left with the strip running beside it,
+   split by a hairline. A centred eyebrow floating above the strip read as a
+   caption; this reads as the band's name. */
+.home__glass--tools { padding: clamp(10px, 1.4vh, 16px) clamp(12px, 1.2vw, 20px); }
+.home__tools {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.home__tools-head { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.home__tools-eyebrow {
+  font-size: var(--fs-eyebrow);
+  font-weight: 600;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--orange-ink);
+}
+.home__tools-label {
+  font-size: clamp(15px, 1.15vw, 20px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--navy);
+  white-space: nowrap;
+}
+@media (min-width: 1100px) {
+  .home__tools {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(14px, 1.4vw, 24px);
+  }
+  .home__tools-head {
+    padding-right: clamp(14px, 1.4vw, 24px);
+    border-right: 1px solid var(--line-strong);
+  }
+}
+
+/* ---------- Showcase band ----------
+   `min-height: 0` is what lets the 1fr row actually shrink; without it the
+   grid floors at the reel's intrinsic height and the panel scrolls. */
+.home__showcase {
+  min-height: 0;
+  min-width: 0;
+  display: grid;
+  gap: clamp(16px, 2vw, 32px);
+}
+
+.home__showcase > .bento { min-height: 0; }
+@media (min-width: 1100px) {
+  .home__showcase > .bento { height: 100%; }
+}
+
+/* ---------- Autopilot in compact mode ----------
+   The section chrome is Home's job here: no header, no section padding, and
+   the fixed 1000x388 design canvas is transform-scaled into the box rather
+   than given a horizontal scrollbar. Autopilot writes --flow-scale from a
+   ResizeObserver; its cable measuring divides that scale back out. */
+.autopilot--compact {
+  padding: 0;
+  gap: 0;
+  width: 100%;
+  min-height: 0;
+}
+.autopilot--compact .autopilot__window {
+  max-width: none;
+  width: 100%;
+  /* `flex: 1` is load-bearing: without it the window sits at its content
+     height, the board collapses to nothing, and the flow - which is absolutely
+     positioned inside an overflow-hidden box - is clipped out of existence. */
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.autopilot--compact .autopilot__canvas {
+  flex: 1 1 auto;
+  min-height: 0;
+  gap: clamp(8px, 1.4vh, 20px);
+  padding: clamp(12px, 2vh, 26px) clamp(14px, 2vw, 28px);
+}
+.autopilot--compact .autopilot__caption {
+  font-size: clamp(13px, 1.1vw, 16px);
+  max-width: none;
+}
+.autopilot--compact .autopilot__board {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
+  padding: 0;
+}
+.autopilot--compact .autopilot__fit {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.autopilot--compact .autopilot__flow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: 0;
+  transform: translate(-50%, -50%) scale(var(--flow-scale, 1));
+  transform-origin: 50% 50%;
+}
+.autopilot--compact .autopilot__tools {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+/* Below the shell breakpoint the page scrolls again: a 1000px canvas cannot
+   be usefully squeezed onto a phone, so compact reverts to the board's own
+   horizontal scroll and a natural height. */
+@media (max-width: 1099px) {
+  .autopilot--compact .autopilot__board { overflow-x: auto; }
+  .autopilot--compact .autopilot__fit { height: auto; }
+  .autopilot--compact .autopilot__flow {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    margin: 0 auto;
+  }
+  .home__headline { flex-direction: column; }
+
+  /* The floating pill is fixed at the top of the document down here, so the
+     headline has to start below it or the first line reads through the navy. */
+  .home { padding-top: 104px; }
+}

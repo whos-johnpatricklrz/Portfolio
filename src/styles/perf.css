@@ -1,0 +1,29 @@
+/* ============================================================
+   PERF TIERS
+   Applied by lib/perf.ts as `<html data-perf="mid|low">` when the page
+   measures itself unable to hold frame. Nothing here loads for a visitor
+   whose device never trips the gate.
+
+   mid  every backdrop-filter goes off. The big ones (`.home__glass`, the
+        rail material) no longer blur at any tier since 2026-09-13 - they are
+        painted near-opaque in home.css / apple.css - so this only catches
+        the small blurs that remain.
+   low  the shader is unmounted by App.tsx as well; body's --cream / ink
+        ground carries the page, the same baseline phones already get.
+   ============================================================ */
+
+:root[data-perf='mid'] *,
+:root[data-perf='low'] *,
+:root[data-perf='mid'] *::before,
+:root[data-perf='low'] *::before,
+:root[data-perf='mid'] *::after,
+:root[data-perf='low'] *::after {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Belt and braces: App.tsx stops rendering the canvas at `low`, but a tier
+   restored before mount should never paint it even for a frame. */
+:root[data-perf='low'] .hero-canvas {
+  display: none;
+}

@@ -1,0 +1,250 @@
+/* ============================================
+   ACCESSIBILITY MENU - fixed bottom-left
+   The reviews widget's twin: navy panel, cream
+   text, one orange accent. Below it, the effect
+   of each switch, keyed off `data-a11y-*` on
+   <html> (written by lib/a11y.ts).
+   ============================================ */
+.a11y {
+  position: fixed;
+  left: clamp(16px, 3vw, 28px);
+  bottom: clamp(16px, 3vw, 28px);
+  /* above the rail (700), which owns the bottom-left corner on desktop */
+  z-index: 710;
+  font-family: var(--font-display);
+}
+@media (max-width: 1099px) {
+  /* clear the bottom tab bar on phones */
+  .a11y { left: 14px; bottom: calc(94px + env(safe-area-inset-bottom, 0px)); }
+}
+
+.a11y__button {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  background: var(--navy);
+  color: var(--cream);
+  border: 1px solid color-mix(in srgb, var(--cream) 14%, transparent);
+  border-radius: var(--radius-circle);
+  box-shadow: 0 16px 38px -16px rgba(6, 12, 26, 0.6);
+  cursor: pointer;
+  transition:
+    transform var(--dur-med) var(--ease-spring),
+    box-shadow var(--dur-med) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .a11y__button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 22px 48px -18px rgba(6, 12, 26, 0.7);
+  }
+}
+.a11y__button:focus-visible,
+.a11y__close:focus-visible,
+.a11y__size:focus-visible,
+.a11y__switch:focus-visible,
+.a11y__reset:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
+}
+
+/* ---- panel ---- */
+.a11y__panel {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 12px);
+  width: min(300px, calc(100vw - 32px));
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--navy);
+  color: var(--cream);
+  border: 1px solid color-mix(in srgb, var(--cream) 14%, transparent);
+  border-radius: 18px;
+  box-shadow: 0 30px 60px -20px rgba(6, 12, 26, 0.7);
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+  transform-origin: bottom left;
+  pointer-events: none;
+  transition:
+    opacity var(--dur-fast) var(--ease-out),
+    transform var(--dur-med) var(--ease-spring);
+}
+.a11y.is-open .a11y__panel {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.a11y__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.a11y__title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.a11y__close {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  background: color-mix(in srgb, var(--cream) 8%, transparent);
+  border: none;
+  border-radius: 9px;
+  color: color-mix(in srgb, var(--cream) 75%, transparent);
+  cursor: pointer;
+}
+.a11y__close:hover {
+  background: color-mix(in srgb, var(--cream) 16%, transparent);
+  color: var(--cream);
+}
+
+.a11y__label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--cream) 55%, transparent);
+}
+.a11y__sizes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.a11y__size {
+  height: 40px;
+  background: color-mix(in srgb, var(--cream) 9%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cream) 12%, transparent);
+  border-radius: 10px;
+  color: var(--cream);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+.a11y__size:nth-child(2) { font-size: 16px; }
+.a11y__size:nth-child(3) { font-size: 18px; }
+.a11y__size:hover { background: color-mix(in srgb, var(--cream) 14%, transparent); }
+.a11y__size.is-on {
+  background: var(--orange);
+  border-color: var(--orange);
+  color: var(--white);
+}
+
+.a11y__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.a11y__switch {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 10px;
+  background: transparent;
+  border: none;
+  border-radius: 11px;
+  color: var(--cream);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.a11y__switch:hover { background: color-mix(in srgb, var(--cream) 8%, transparent); }
+.a11y__switch-text { display: flex; flex-direction: column; gap: 1px; }
+.a11y__switch-label { font-size: 13.5px; font-weight: 600; }
+.a11y__switch-desc { font-size: 12px; color: color-mix(in srgb, var(--cream) 58%, transparent); }
+.a11y__toggle {
+  position: relative;
+  flex: none;
+  width: 38px;
+  height: 22px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--cream) 18%, transparent);
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.a11y__toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-circle);
+  background: var(--cream);
+  transition: transform var(--dur-med) var(--ease-spring);
+}
+.a11y__switch.is-on .a11y__toggle { background: var(--orange); }
+.a11y__switch.is-on .a11y__toggle::after { transform: translateX(16px); background: var(--white); }
+
+.a11y__reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  background: color-mix(in srgb, var(--cream) 9%, transparent);
+  border: none;
+  border-radius: 10px;
+  color: var(--cream);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.a11y__reset:hover { background: color-mix(in srgb, var(--cream) 14%, transparent); }
+.a11y__reset:disabled { opacity: 0.4; cursor: default; }
+
+/* ============================================
+   EFFECTS
+   ============================================ */
+
+/* Text size: the sheets size in px, so scale content the way the browser's
+   own zoom does rather than re-sizing every rule. The scale goes on what the
+   rail and the panel CONTAIN, not the 100dvh boxes themselves, so the shell
+   keeps its height and both columns scroll when the content outgrows them.
+   Home, which normally lays out to the panel box, is allowed to scroll too. */
+:root[data-a11y-text='lg'] .rail__inner,
+:root[data-a11y-text='lg'] .shell__panel > * { zoom: 1.12; }
+:root[data-a11y-text='xl'] .rail__inner,
+:root[data-a11y-text='xl'] .shell__panel > * { zoom: 1.25; }
+:root[data-a11y-text] .shell__panel[data-fixed='true'] { overflow-y: auto; }
+:root[data-a11y-text] .home__showcase > .bento { height: auto; }
+
+/* High contrast: the muted grey climbs to near-ink and hairlines darken. */
+:root[data-a11y-contrast='true'] {
+  --muted: #2A3550;
+  --line: rgba(11, 30, 63, 0.4);
+  --orange-ink: #9A3D06;
+}
+:root[data-a11y-contrast='true'][data-theme='dark'] {
+  --muted: rgba(237, 240, 246, 0.88);
+  --line: rgba(255, 255, 255, 0.3);
+  --orange-ink: #FFB070;
+}
+
+/* Reduce motion: every animation and transition stops; drifting tracks hold. */
+:root[data-a11y-motion='true'] *,
+:root[data-a11y-motion='true'] *::before,
+:root[data-a11y-motion='true'] *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+
+/* Underline links: real links inside the page only, not the rail tabs or
+   the two widgets, which already read as controls. */
+:root[data-a11y-links='true'] .shell__panel a {
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}

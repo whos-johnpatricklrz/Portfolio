@@ -1,0 +1,125 @@
+:root {
+  /* Brand palette */
+  --navy:       #0B1E3F;   /* primary text, card surface, dark accents */
+  --navy-ink:   #060C1A;   /* matches shader dark base for .dark-section */
+  --cream:      #F4F4ED;   /* matches shader light base, page bg */
+  --white:      #FFFFFF;
+  --orange:     #FF7A1A;   /* CTA, accent bar, active dot */
+  --orange-hover: #FFA155; /* CTA hover state */
+  --orange-ink: #B4490A;   /* accessible orange TEXT on light bg - 4.88:1 on cream, 5.39:1 on white (WCAG AA) */
+  --muted:      #5A6479;
+  --divider:    rgba(11, 30, 63, 0.12);
+  --success:    #2E9E6B;   /* form status ok - clears 4.5:1 on navy-ink */
+  --error:      #D9544F;   /* form status error - clears 4.5:1 on navy-ink */
+
+  /* Brands section - neutral logo plate so client marks read as framed logos,
+     not site UI (esp. an orange logo vs the --orange accent) */
+  --brands-chip-bg:     #FBFBF7;                  /* cool near-white, lifts off cream */
+  --brands-chip-border: rgba(11, 30, 63, 0.10);   /* hairline frame on the logo medallion */
+
+  /* Type */
+  --font-display: 'Poppins', system-ui, -apple-system, sans-serif;
+  --fs-display: clamp(64px, 9vw, 128px);
+  --fs-h2: clamp(32px, 4vw, 56px);
+  --fs-h3: clamp(22px, 2vw, 28px);
+  --fs-body: 15px;
+  --fs-eyebrow: 12px;
+  --fs-nav: 15px;
+  --lh-tight: 0.95;
+  --lh-heading: 1.25;
+  --lh-body: 1.65;
+  --ls-display: -0.03em;
+  --ls-eyebrow: 0.18em;
+
+  /* Layout */
+  --container-x: clamp(24px, 6vw, 96px);
+  --section-pad-y: clamp(110px, 13vh, 170px);
+  --radius-card: 24px;
+  --radius-pill: 999px;
+  --radius-circle: 50%;
+
+  /* Shadows */
+  --shadow-soft: 0 20px 60px -20px rgba(11, 30, 63, 0.25);
+  --shadow-card: 0 40px 120px -30px rgba(6, 12, 26, 0.35);
+  --shadow-btn: 0 8px 24px -8px rgba(11, 30, 63, 0.25);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 180ms;
+  --dur-med: 320ms;
+  --dur-slow: 600ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================
+   SHELL + THEME (rail redesign)
+   The page shell is fixed to the viewport: a left profile rail plus one
+   scrolling panel. --rail-w is 0 until the rail actually renders at 1100px,
+   so every `calc(100% - var(--rail-w))` stays correct on mobile.
+   ============================================ */
+:root {
+  --rail-w: 0px;
+  --panel-x: clamp(20px, 4vw, 64px);
+
+  /* Surfaces. These are the tokens that had to exist for the theme to flip
+     without rewriting the section stylesheets. */
+  --paper:      #FBFBF7;   /* raised card on cream */
+  --line:       rgba(11, 30, 63, 0.14);
+  --line-strong:rgba(11, 30, 63, 0.28);
+  --tint:       rgba(11, 30, 63, 0.05);
+  --tint-strong:rgba(11, 30, 63, 0.09);
+  --glass:      rgba(251, 251, 247, 0.72);
+  /* A plate that stays light in BOTH themes. Brand marks are external
+     identifiers and need a constant backdrop to read against. */
+  --plate:      #F4F4ED;
+  /* The opaque fill for sections that were written as white-on-navy back when
+     the shader inverted on scroll. It no longer does, so they carry their own
+     ground. Same navy in both themes: their type is light either way. */
+  --panel-dark: #060C1A;
+
+  /* Verified badge - Facebook blue, not the site accent. It is a platform
+     signal, not brand furniture, so it does not follow --orange. */
+  --verified:   #0866FF;
+
+  /* Ink for anything sitting on --plate. Both are constant across themes:
+     a brand mark on a light plate must not invert with the page. */
+  --plate-ink:  #0B1E3F;
+}
+
+@media (min-width: 1100px) {
+  :root { --rail-w: 312px; }
+}
+
+/* ---------- Dark theme ----------
+   Redefined at the root, not per component: every existing rule keeps reading
+   --cream (page), --navy (ink), --white (card surface) and flips with it.
+   Orange stays the single accent in both modes. */
+[data-theme='dark'] {
+  --cream:        #070B14;
+  --paper:        #0B1120;
+  --white:        #0E1626;
+  --navy:         #EDF0F6;
+  --navy-ink:     #04070F;
+  --muted:        rgba(237, 240, 246, 0.60);
+  --divider:      rgba(255, 255, 255, 0.10);
+  --line:         rgba(255, 255, 255, 0.09);
+  --line-strong:  rgba(255, 255, 255, 0.20);
+  --tint:         rgba(255, 255, 255, 0.05);
+  --tint-strong:  rgba(255, 255, 255, 0.09);
+  --glass:        rgba(14, 22, 38, 0.72);
+  --orange-ink:   #FF9A4D;
+  --panel-dark:   #0B1120;
+  --brands-chip-bg:     #F4F4ED;
+  --brands-chip-border: rgba(255, 255, 255, 0.14);
+  --shadow-soft:  0 20px 60px -20px rgba(0, 0, 0, 0.75);
+  --shadow-card:  0 40px 120px -30px rgba(0, 0, 0, 0.85);
+  --shadow-btn:   0 8px 24px -8px rgba(0, 0, 0, 0.7);
+}
