@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" role="img" aria-label="Anonymous avatar placeholder">
+  <defs>
+    <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9AA6B8"/>
+      <stop offset="1" stop-color="#6F7C90"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5B6779"/>
+      <stop offset="1" stop-color="#3E4859"/>
+    </linearGradient>
+  </defs>
+  <!-- Head and shoulders silhouette on a transparent background, so it sits on
+       any surface the way the original cut-out portraits did. Replace with
+       your own photo: public/avatar.svg (or point site.ts at a .webp). -->
+  <path d="M60 400c0-86 62-140 140-140s140 54 140 140z" fill="url(#body)"/>
+  <circle cx="200" cy="165" r="78" fill="url(#skin)"/>
+  <path d="M170 236h60v34c0 16-14 26-30 26s-30-10-30-26z" fill="url(#skin)"/>
+</svg>

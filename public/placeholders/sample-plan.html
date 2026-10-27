@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sample Document - Placeholder</title>
+<meta name="robots" content="noindex">
+<style>
+  :root {
+    --paper: #fbfaf6;
+    --ink: #14161c;
+    --muted: #5d6270;
+    --line: #e4e1d6;
+    --tint: #f2efe6;
+    --accent: #ff5722;
+    --accent-soft: #fff1ea;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0e0f16;
+      --ink: #f2f2f5;
+      --muted: #a2a6b4;
+      --line: #262836;
+      --tint: #161824;
+      --accent-soft: #2a1710;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .doc { max-width: 760px; margin: 0 auto; padding: 56px 20px 80px; }
+  .tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    font: 600 12px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: .08em; text-transform: uppercase;
+    color: var(--accent); background: var(--accent-soft);
+    padding: 7px 10px; border-radius: 999px;
+  }
+  .tag svg { width: 12px; height: 12px; }
+  h1 { font-size: clamp(30px, 5vw, 44px); line-height: 1.1; letter-spacing: -.02em; margin: 18px 0 12px; }
+  .lede { color: var(--muted); font-size: 18px; margin: 0 0 28px; max-width: 58ch; }
+  .meta { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; margin-bottom: 44px; }
+  .meta div { background: var(--paper); padding: 14px 16px; }
+  .meta span { display: block; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .meta b { font-weight: 600; font-size: 15px; }
+  h2 { font-size: 22px; letter-spacing: -.01em; margin: 44px 0 10px; display: flex; gap: 12px; align-items: baseline; }
+  h2 i { font: 600 13px/1 ui-monospace, SFMono-Regular, Menlo, monospace; font-style: normal; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .hint {
+    border: 1px dashed var(--line); background: var(--tint);
+    border-radius: var(--radius); padding: 14px 16px; color: var(--muted); font-size: 15px;
+  }
+  .hint strong { color: var(--ink); }
+  .flow { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 4px; }
+  .flow span {
+    border: 1px solid var(--line); background: var(--paper);
+    border-radius: 10px; padding: 8px 12px; font-size: 14px; font-weight: 500;
+  }
+  .flow span.on { border-color: var(--accent); color: var(--accent); }
+  .flow em { align-self: center; color: var(--muted); font-style: normal; }
+  ul.list { padding-left: 20px; margin: 8px 0 0; color: var(--muted); }
+  ul.list li { margin: 4px 0; }
+  footer { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+  @media (max-width: 560px) { .meta { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+  <main class="doc">
+    <span class="tag">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 1.5h5.5L13 5v9.5H4z"/><path d="M9 1.5V5h4"/></svg>
+      <span id="doc-kind">Placeholder sample document</span>
+    </span>
+    <h1 id="doc-title">Your document title goes here.</h1>
+    <p class="lede">PLACEHOLDER - tell me what to put here: a one-line summary of this plan or case study, who it was for, and the result.</p>
+
+    <div class="meta">
+      <div><span>Client</span><b>Client Name</b></div>
+      <div><span>Timeline</span><b>0 weeks</b></div>
+      <div><span>Outcome</span><b>Result metric</b></div>
+    </div>
+
+    <h2><i>01</i>The problem</h2>
+    <div class="hint"><strong>PLACEHOLDER - tell me what to put here:</strong> what was broken or missing before you started, in two or three sentences.</div>
+
+    <h2><i>02</i>The plan</h2>
+    <p class="hint"><strong>PLACEHOLDER - tell me what to put here:</strong> the steps you mapped out before building anything.</p>
+    <div class="flow" aria-label="Example flow">
+      <span>Step one</span><em>&rarr;</em>
+      <span>Step two</span><em>&rarr;</em>
+      <span>Decision?</span><em>&rarr;</em>
+      <span class="on">Result</span>
+    </div>
+
+    <h2><i>03</i>What was built</h2>
+    <div class="hint"><strong>PLACEHOLDER - tell me what to put here:</strong> the pieces you delivered.</div>
+    <ul class="list">
+      <li>Deliverable one</li>
+      <li>Deliverable two</li>
+      <li>Deliverable three</li>
+    </ul>
+
+    <h2><i>04</i>Results</h2>
+    <div class="hint"><strong>PLACEHOLDER - tell me what to put here:</strong> the numbers or the change the client saw afterwards.</div>
+
+    <footer>This is a placeholder page shipped with the template. Replace public/placeholders/sample-plan.html with your own document.</footer>
+  </main>
+  <script>
+    // ?doc=N labels the page for the featured-project panels that reuse it.
+    (function () {
+      var n = new URLSearchParams(location.search).get('doc');
+      var names = { '1': 'Featured Project One', '2': 'Featured Project Two', '3': 'Featured Project Three' };
+      if (!n || !names[n]) return;
+      var kind = document.getElementById('doc-kind');
+      var title = document.getElementById('doc-title');
+      if (kind) kind.textContent = 'Placeholder - ' + names[n];
+      if (title) title.textContent = names[n] + ': your page goes here.';
+    })();
+  </script>
+</body>
+</html>

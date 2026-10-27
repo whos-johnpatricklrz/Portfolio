@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" role="img" aria-label="Credential badge placeholder">
+  <!-- Swap for your certification badge. -->
+  <path d="M34 60 26 90l22-10 22 10-8-30z" fill="#64748B"/>
+  <circle cx="48" cy="40" r="32" fill="#E2E8F0" stroke="#94A3B8" stroke-width="3"/>
+  <circle cx="48" cy="40" r="23" fill="none" stroke="#94A3B8" stroke-width="2" stroke-dasharray="4 4"/>
+  <text x="48" y="37" text-anchor="middle" font-family="system-ui,sans-serif" font-size="9" font-weight="800" fill="#475569">YOUR</text>
+  <text x="48" y="49" text-anchor="middle" font-family="system-ui,sans-serif" font-size="9" font-weight="800" fill="#475569">BADGE</text>
+</svg>
